@@ -417,6 +417,11 @@ class modscrumboard extends DolibarrModules
 			  , ADD date_estimated_end DATETIME NOT NULL 
 			  , ADD INDEX (date_estimated_start, date_estimated_end)");
 	
+		$db->query("ALTER TABLE `".MAIN_DB_PREFIX."projet_task` 
+					ADD `fk_soc` integer NOT NULL DEFAULT '0',
+					ADD `fk_product_ral` integer NOT NULL DEFAULT '0'");		
+					
+	
 		dol_include_once('/core/class/extrafields.class.php');
         $extrafields=new ExtraFields($this->db);
         $res = $extrafields->addExtraField('color', 'Couleur du projet', 'varchar', 1, 8, 'projet', false, false, '');
