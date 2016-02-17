@@ -178,7 +178,7 @@ function _ordo_int_get_good_row_ral(&$TTaskToOrder, &$taskToMove, $tolerance) {
     
     foreach($TTaskToOrder as &$task) {
         
-       if($task['grid_row']!=999999 && $task['fk_workstation'] ==  $taskToMove['fk_workstation'] && $task['fk_product'] == $TTaskToOrder['fk_product']) {
+       if($task['grid_row']!=999999 && $task['fk_workstation'] ==  $taskToMove['fk_workstation']) {
                
            if($taskToMove['fk_product_ral'] == $task['fk_product_ral'] ) {
                $grid_row = $task['grid_row'];
@@ -192,6 +192,29 @@ function _ordo_int_get_good_row_ral(&$TTaskToOrder, &$taskToMove, $tolerance) {
     return ($grid_row == 999999) ? 999999 : $grid_row+0.0001;
     
 }
+
+function _ordo_int_get_good_row_customer(&$TTaskToOrder, &$taskToMove, $tolerance) {
+	
+    $good_date = false;
+    $grid_row = 999999;
+    
+    foreach($TTaskToOrder as &$task) {
+        
+       if($task['grid_row']!=999999 && $task['fk_workstation'] ==  $taskToMove['fk_workstation']) {
+               
+           if($taskToMove['fk_soc_order'] == $task['fk_soc_order'] ) {
+               $grid_row = $task['grid_row'];
+			  // echo $grid_row.'<br />';
+           }
+           
+       }
+        
+    }
+    
+    return ($grid_row == 999999) ? 999999 : $grid_row+0.0001;
+	
+}
+
 function _ordo_sort_by_grid_row(&$a, &$b) {
 	
 	if($a['grid_row']<$b['grid_row']) return -1;
@@ -199,6 +222,7 @@ function _ordo_sort_by_grid_row(&$a, &$b) {
 	else return 0;
 	
 }
+
 function _ordo_init_new_task(&$TTaskToOrder) {
     global $conf;
     //pre($TTaskToOrder, true);exit;
@@ -210,11 +234,13 @@ function _ordo_init_new_task(&$TTaskToOrder) {
                 $task['grid_row'] = _ordo_int_get_good_row_product($TTaskToOrder, $task, $conf->global->SCRUM_GROUP_TASK_BY_PRODUCT_TOLERANCE);
             }
 			
-            
             if(!empty($conf->global->SCRUM_GROUP_TASK_BY_RAL) && $task['fk_product_ral'] > 0) {
-            
             	$task['grid_row'] = _ordo_int_get_good_row_ral($TTaskToOrder, $task, $conf->global->SCRUM_GROUP_TASK_BY_PRODUCT_TOLERANCE);
             }
+			
+			if(!empty($conf->global->SCRUM_GROUP_TASK_BY_CUSTOMER) && $task['fk_soc_order'] > 0) {
+				$task['grid_row'] = _ordo_int_get_good_row_customer($TTaskToOrder, $task, $conf->global->SCRUM_GROUP_TASK_BY_PRODUCT_TOLERANCE);
+			}
             
 			//var_dump($task['id'], $task['grid_row']);
 			

@@ -215,6 +215,10 @@ function showParameters() {
             <td><?php echo $langs->trans('GroupTaskByRAL') ?></td>
             <td><?php print $html->selectyesno("TDivers[SCRUM_GROUP_TASK_BY_RAL]",$conf->global->SCRUM_GROUP_TASK_BY_RAL,1); ?><input type="submit" value="<?php echo $langs->trans('Modify'); ?>" name="bt_submit" /></td>               
         </tr>
+        <tr>
+            <td><?php echo $langs->trans('GroupTaskByCustomer') ?></td>
+            <td><?php print $html->selectyesno("TDivers[SCRUM_GROUP_TASK_BY_CUSTOMER]",$conf->global->SCRUM_GROUP_TASK_BY_CUSTOMER,1); ?><input type="submit" value="<?php echo $langs->trans('Modify'); ?>" name="bt_submit" /></td>               
+        </tr>
         
         <tr>
             <td><?php echo $langs->trans('ProductTolerance') ?></td>
