@@ -49,6 +49,11 @@ if($action=='save') {
             $default_value = array('options'=> array(0=>$langs->trans('Normal'), 1=>$langs->trans('Important')));
             $res = $extrafields->addExtraField('priority', 'Priorité', 'select', 1, 0, 'projet', false, false, '', serialize( $default_value ) );
         }
+		if($name == 'SCRUM_GROUP_TASK_BY_RAL' && $param == 1) {
+            $extrafields=new ExtraFields($db);
+            $res = $extrafields->addExtraField('fk_soc_order', 'Société liée à la commande', 'varchar', '', 255, 'projet_task');
+            $res = $extrafields->addExtraField('fk_product_ral', 'RAL liée à la commande', 'varchar', '', 255, 'projet_task');
+        }
         /*else if($name == 'SCRUM_GROUP_TASK_BY_PRODUCT' && $param == 1) {
             $extrafields=new ExtraFields($db);
             $res = $extrafields->addExtraField('grou', 'Priorité', 'select', 1, 0, 'projet', false, false, '', serialize( $default_value ) );
@@ -205,6 +210,10 @@ function showParameters() {
                 }
             
             ?></td>             
+        </tr>
+        <tr>
+            <td><?php echo $langs->trans('GroupTaskByRAL') ?></td>
+            <td><?php print $html->selectyesno("TDivers[SCRUM_GROUP_TASK_BY_RAL]",$conf->global->SCRUM_GROUP_TASK_BY_RAL,1); ?><input type="submit" value="<?php echo $langs->trans('Modify'); ?>" name="bt_submit" /></td>               
         </tr>
         
         <tr>

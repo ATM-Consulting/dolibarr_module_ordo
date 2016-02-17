@@ -171,23 +171,58 @@ function _ordo_int_get_good_row_product(&$TTaskToOrder, &$taskToMove, $tolerance
     
 }
 
+function _ordo_int_get_good_row_ral(&$TTaskToOrder, &$taskToMove, $tolerance) {
+    
+    $good_date = false;
+    $grid_row = 999999;
+    
+    foreach($TTaskToOrder as &$task) {
+        
+       if($task['grid_row']!=999999 && $task['fk_workstation'] ==  $taskToMove['fk_workstation'] && $task['fk_product'] == $TTaskToOrder['fk_product']) {
+               
+           if($taskToMove['fk_product_ral'] == $task['fk_product_ral'] ) {
+               $grid_row = $task['grid_row'];
+			  // echo $grid_row.'<br />';
+           }
+           
+       }
+        
+    }
+    
+    return ($grid_row == 999999) ? 999999 : $grid_row+0.0001;
+    
+}
+function _ordo_sort_by_grid_row(&$a, &$b) {
+	
+	if($a['grid_row']<$b['grid_row']) return -1;
+	else if($a['grid_row']>$b['grid_row']) return 1;
+	else return 0;
+	
+}
 function _ordo_init_new_task(&$TTaskToOrder) {
     global $conf;
+    //pre($TTaskToOrder, true);exit;
     
     foreach($TTaskToOrder as &$task) {
         if($task['grid_row'] == 999999) {
             
             if(!empty($conf->global->SCRUM_GROUP_TASK_BY_PRODUCT) && $task['fk_product']>0 ) {
-                
                 $task['grid_row'] = _ordo_int_get_good_row_product($TTaskToOrder, $task, $conf->global->SCRUM_GROUP_TASK_BY_PRODUCT_TOLERANCE);
-                
+            }
+			
+            
+            if(!empty($conf->global->SCRUM_GROUP_TASK_BY_RAL) && $task['fk_product_ral'] > 0) {
+            
+            	$task['grid_row'] = _ordo_int_get_good_row_ral($TTaskToOrder, $task, $conf->global->SCRUM_GROUP_TASK_BY_PRODUCT_TOLERANCE);
             }
             
-            
-            
+			//var_dump($task['id'], $task['grid_row']);
+			
         }
         
     }
+	
+	usort($TTaskToOrder, '_ordo_sort_by_grid_row');
     
 }
 
@@ -449,7 +484,7 @@ global $conf,$db;
        if( $fk_workstation_to_order == 0  ||  $fk_workstation == $fk_workstation_to_order ) {
                if(!isset($TSmallGeoffrey[$fk_workstation])) $TSmallGeoffrey[$fk_workstation] = new TSmallGeoffrey($ws_nb_ressource, $TWorkstation[$fk_workstation]['nb_hour_before'], $TWorkstation[$fk_workstation]['nb_hour_after']);
                if(!isset( $TDayOff[$fk_workstation] )) $TDayOff[$fk_workstation] = _ordo_init_dayOff($TSmallGeoffrey[$fk_workstation], $fk_workstation, $time_init, $time_day, $nb_second_in_hour, $ws_velocity);
-              
+             
        	       $velocity = $TPlan[$fk_workstation]['@param']['velocity'];
                if($velocity<=0)$velocity=1;
                $height = $task['planned_workload'] / $velocity * (1- ($task['progress'] / 100));
@@ -475,8 +510,8 @@ global $conf,$db;
                else {
                    $y_start_ecart = 0;
                }
-
-               list($col, $row, $grid_height) = $TSmallGeoffrey[$fk_workstation]->getNextPlace($height,$t_nb_ressource, (int)$task['fk_task_parent'] , $y_start_ecart);
+			   
+		       list($col, $row, $grid_height) = $TSmallGeoffrey[$fk_workstation]->getNextPlace($height,$t_nb_ressource, (int)$task['fk_task_parent'] , $y_start_ecart);
                
                $TSmallGeoffrey[$fk_workstation]->addBox($row,$col, $grid_height, $t_nb_ressource, $task['id'], $task['fk_parent']);
                
@@ -488,7 +523,7 @@ global $conf,$db;
        		   $task['grid_row'] = $row;
 			   $task['grid_height'] = $grid_height;
 	  
-      //TODO prendre en compte les jours non travaillé
+	  //TODO prendre en compte les jours non travaillé
                $task['time_estimated_start'] = $time_day + ($row * $nb_second_in_hour);
                $task['time_estimated_end'] =  $task['time_estimated_start'] + ($height  *$nb_second_in_hour) ;
                $task['time_projection'] ='Début prévu : '.dol_print_date($task['time_estimated_start'],'daytext').', '.getHourInDay($task['time_estimated_start'])
@@ -511,7 +546,7 @@ global $conf,$db;
                 $TTaskOrdered[] = $task;
        }
     }
-     
+      
     //$TTimeScale = scrumboard_get_time_scale($TTaskOrdered, $time_init); 
      //var_dump($TPlan[2]['@free']);exit;
     return array('tasks'=>$TTaskOrdered, 'timeScale'=>$TTimeScale, 'dayOff'=>$TDayOff);
