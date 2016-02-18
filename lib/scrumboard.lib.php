@@ -171,48 +171,53 @@ function _ordo_int_get_good_row_product(&$TTaskToOrder, &$taskToMove, $tolerance
     
 }
 
-function _ordo_int_get_good_row_ral(&$TTaskToOrder, &$taskToMove, $tolerance) {
+function _ordo_int_get_good_row_ral_or_customer(&$TTaskToOrder, &$taskToMove, $tolerance, $groupByRAL, $groupByCustomer) {
     
     $good_date = false;
     $grid_row = 999999;
     
-    foreach($TTaskToOrder as &$task) {
-        
-       if($task['grid_row']!=999999 && $task['fk_workstation'] ==  $taskToMove['fk_workstation']) {
-               
-           if($taskToMove['fk_product_ral'] == $task['fk_product_ral'] ) {
-               $grid_row = $task['grid_row'];
-			  // echo $grid_row.'<br />';
-           }
-           
-       }
-        
-    }
-    
+	// Par RAL
+	if(!empty($groupByRAL)) {
+		
+	    foreach($TTaskToOrder as &$task) {
+	        
+	       if($task['grid_row']!=999999 && $task['fk_workstation'] ==  $taskToMove['fk_workstation']) {
+	           
+			   if(!empty($groupByCustomer) && $taskToMove['fk_product_ral'] == $task['fk_product_ral'] && $taskToMove['fk_soc_order'] == $task['fk_soc_order']) {
+			       // Si on trouve une tâche avec la même RAL et le même tiers, on cherche pas plus loin, on mets la tâche actuelle juste après, et on arrête de chercher.
+			       $grid_row = $task['grid_row'];
+				   break;
+			   } elseif($taskToMove['fk_product_ral'] == $task['fk_product_ral'] ) {
+	               $grid_row = $task['grid_row'];
+				  // echo $grid_row.'<br />';
+	           }
+	           
+	       }
+	        
+	    }
+		
+	}
+	
+	// Par Client
+	if(!empty($groupByCustomer) && $grid_row == 999999) { // Si la tâche n'a pas encore été ordonnancée par RAL
+		
+	    foreach($TTaskToOrder as &$task) {
+	        
+	       if($task['grid_row']!=999999 && $task['fk_workstation'] ==  $taskToMove['fk_workstation']) {
+	               
+	           if($taskToMove['fk_soc_order'] == $task['fk_soc_order'] ) {
+	               $grid_row = $task['grid_row'];
+				  // echo $grid_row.'<br />';
+	           }
+	           
+	       }
+	        
+	    }
+		
+	}
+	
     return ($grid_row == 999999) ? 999999 : $grid_row+0.0001;
     
-}
-
-function _ordo_int_get_good_row_customer(&$TTaskToOrder, &$taskToMove, $tolerance) {
-	
-    $good_date = false;
-    $grid_row = 999999;
-    
-    foreach($TTaskToOrder as &$task) {
-        
-       if($task['grid_row']!=999999 && $task['fk_workstation'] ==  $taskToMove['fk_workstation']) {
-               
-           if($taskToMove['fk_soc_order'] == $task['fk_soc_order'] ) {
-               $grid_row = $task['grid_row'];
-			  // echo $grid_row.'<br />';
-           }
-           
-       }
-        
-    }
-    
-    return ($grid_row == 999999) ? 999999 : $grid_row+0.0001;
-	
 }
 
 function _ordo_sort_by_grid_row(&$a, &$b) {
@@ -234,13 +239,9 @@ function _ordo_init_new_task(&$TTaskToOrder) {
                 $task['grid_row'] = _ordo_int_get_good_row_product($TTaskToOrder, $task, $conf->global->SCRUM_GROUP_TASK_BY_PRODUCT_TOLERANCE);
             }
 			
-            if(!empty($conf->global->SCRUM_GROUP_TASK_BY_RAL) && $task['fk_product_ral'] > 0) {
-            	$task['grid_row'] = _ordo_int_get_good_row_ral($TTaskToOrder, $task, $conf->global->SCRUM_GROUP_TASK_BY_PRODUCT_TOLERANCE);
+            if((!empty($conf->global->SCRUM_GROUP_TASK_BY_RAL) || !empty($conf->global->SCRUM_GROUP_TASK_BY_CUSTOMER)) && $task['fk_product_ral'] > 0) {
+            	$task['grid_row'] = _ordo_int_get_good_row_ral_or_customer($TTaskToOrder, $task, $conf->global->SCRUM_GROUP_TASK_BY_PRODUCT_TOLERANCE, $conf->global->SCRUM_GROUP_TASK_BY_RAL, $conf->global->SCRUM_GROUP_TASK_BY_CUSTOMER);
             }
-			
-			if(!empty($conf->global->SCRUM_GROUP_TASK_BY_CUSTOMER) && $task['fk_soc_order'] > 0) {
-				$task['grid_row'] = _ordo_int_get_good_row_customer($TTaskToOrder, $task, $conf->global->SCRUM_GROUP_TASK_BY_PRODUCT_TOLERANCE);
-			}
             
 			//var_dump($task['id'], $task['grid_row']);
 			
