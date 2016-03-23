@@ -25,7 +25,7 @@ function TOrdonnancement() {
  	   		var initLeft = parseInt( $(el).attr('data-mfx-left') );
  	   		var leftScroll = parseInt($(document).scrollLeft());
  	   		var newLeft = initLeft - leftScroll;
- 	   		console.log(initLeft,leftScroll,newLeft);
+ 	   		//console.log(initLeft,leftScroll,newLeft);
  	   		$(el).css({
  	   			left : newLeft
  	   		});
@@ -229,7 +229,7 @@ function TOrdonnancement() {
 		$li.attr('id', 'task-'+task.id);
 		$li.addClass('draggable');
 		
-		console.log(ordo_height, task.fk_workstation,$li);
+		//console.log(ordo_height, task.fk_workstation,$li);
 		
 		$ul = $('#list-task-'+task.fk_workstation);
 	    $ul.append($li); 	
@@ -310,7 +310,7 @@ function TOrdonnancement() {
 			
 			var nb_tasks = tasks['tasks'].length;
 			$.each(tasks['tasks'], function(i, task) {
-				console.log(task);
+				//console.log(task);
 				task_top = coef_time * task.grid_row/* / TVelocity[task.fk_workstation]*/; // vélocité déjà dans le top 
 			
 				$li = $('li[task-id='+task.id+']');
@@ -326,7 +326,7 @@ function TOrdonnancement() {
 				if(task.TUser!=null) {
 					for(idUser in task.TUser) {
 						var tUser = task.TUser[idUser];
-						$li.find('[rel=users]').append('<input taskid="'+task.id+'" userid="'+idUser+'" type="checkbox" id="TUser['+task.id+']['+idUser+']" name="TUser['+task.id+']['+idUser+']" value="1" onchange="OrdoToggleContact($(this));" '+(tUser.selected==1 ? 'checked="checked"':''  )+'/> <label for="TUser['+task.id+']['+idUser+']">'+tUser.name+'</label><br />' );
+						$li.find('[rel=users]').append('<div rel="user-check-'+task.id+'-'+idUser+'"><input taskid="'+task.id+'" userid="'+idUser+'" type="checkbox" id="TUser['+task.id+']['+idUser+']" name="TUser['+task.id+']['+idUser+']" value="1" onchange="OrdoToggleContact($(this));" '+(tUser.selected==1 ? 'checked="checked"':''  )+'/> <label for="TUser['+task.id+']['+idUser+']">'+tUser.name+'</label></div>' );
 						
 					}
 					
@@ -343,7 +343,7 @@ function TOrdonnancement() {
 						height = Math.round( duration * (1- (task.progress / 100)) /TVelocity[task.fk_workstation]*coef_time  );
 					}
 				}
-				console.log('ordo', height);
+				//console.log('ordo', height);
 				$li.attr('ordo-height', height);
 				
 				$li.css('width', Math.round( (width_column*task.needed_ressource)-2 ));
@@ -364,21 +364,9 @@ function TOrdonnancement() {
 					
 				}
 				
-				if(i>10) {
-					 
-					 $li.css({
-                        	top:task_top
-                        	,left:(width_column * task.grid_col)
-                        	,height: height
-                	 });
-					 
-					 /*if(i+1 == nb_tasks) {
-					 	afterAnimationOrder();
-					 }*/
-					 
-				}
-				else {
-					
+				current_position = $li.position();
+				if(current_position && (current_position.top!=task_top || current_position.left!=width_column * task.grid_col || $li.height()!=height) ) {
+					//console.log('animate',i, current_position, task_top, width_column * task.grid_col, $li.height(),height);
 					$li.animate({
                         	top:task_top
                         	,left:(width_column * task.grid_col)
@@ -386,14 +374,14 @@ function TOrdonnancement() {
                     }
                     ,{	
                     	complete : function() {
-                    		if(i+1 == nb_tasks || i==10) {
+                    		if(i+1 == nb_tasks || i == 0) {
                     			afterAnimationOrder();
                     		}
                     	}
                     	
                 	});
-
-				}	 
+					
+				}
 				
 				$li.removeClass('loading');				
     
@@ -598,6 +586,45 @@ toggleWorkStation = function (fk_ws, justMe) {
 	    var id = $(item).find('ul.task-list').attr('ws-id');
 	    var visible = ($(item).css('display') != 'none' ) ? 1 : 0;
 	    document.cookie="WSTogle["+id+"]="+visible;
+	    
+	});
+	
+	
+	
+};
+
+printWorkStation = function (fk_ws) {
+	
+	$('#printedFrame,#printedTask').remove();
+	$('body').append('<ul id="printedTask"></ul>');
+	
+	$('ul[ws-id='+fk_ws+']>li[task-id]').each(function (i,item) {
+		
+		$(item).clone()
+			.removeAttr("style")
+			.removeAttr("id")
+			.removeClass("draggable ui-draggable")
+			.appendTo("#printedTask");
+	});
+	
+	$("#printedTask").find(".button,.picto").remove();
+	
+	$("#printedTask").find("[rel=users]>div>input").not(":checked").each(function(i,item) {
+		
+		var taskid = $(item).attr('taskid');
+		var userid = $(item).attr('userid');
+		$('#printedTask div[rel="user-check-'+taskid+'-'+userid+'"]').remove();
+		
+	});
+	
+	$('<iframe id="printedFrame" name="printedFrame">').appendTo("body").ready(function(){
+	    setTimeout(function(){
+	    	
+	    	$('#printedFrame').contents().find('body').append('<link rel="stylesheet" type="text/css" title="default" href="<?php echo dol_buildpath('/scrumboard/css/scrum.css',2) ?>">');
+	    	$('#printedFrame').contents().find('body').append($("#printedTask"));
+	        window.frames["printedFrame"].focus();
+			window.frames["printedFrame"].print();
+	    },50);
 	    
 	});
 	
