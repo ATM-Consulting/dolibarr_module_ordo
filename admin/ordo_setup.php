@@ -86,7 +86,7 @@ if (preg_match('/del_(.*)/',$action,$reg))
 llxHeader('','Gestion de scrumboard, à propos','');
 
 $linkback='<a href="'.DOL_URL_ROOT.'/admin/modules.php">'.$langs->trans("BackToModuleList").'</a>';
-print_fiche_titre('Scrumboard',$linkback,'setup');
+print_fiche_titre('Ordo',$linkback,'setup');
 
 showParameters();
 
@@ -101,72 +101,6 @@ function showParameters() {
 	print '<td>'.$langs->trans("Parameters").'</td>'."\n";
 	print '<td align="center" width="20">&nbsp;</td>';
 	print '<td align="right" width="100">'.$langs->trans("Value").'</td>'."\n";
-
-	$var=!$var;
-	print '<tr '.$bc[$var].'>';
-	print '<td>'.$langs->trans("ActivateTitleDatePerDay").'</td>';
-	print '<td align="center" width="20">&nbsp;</td>';
-	print '<td align="right" width="300">';
-	print ajax_constantonoff('SCRUM_SEE_DELIVERYDATE_PER_DAY');
-	print '</td></tr>';
-
-	$var=!$var;
-	print '<tr '.$bc[$var].'>';
-	print '<td>'.$langs->trans("ActivateTitleDatePerWeek").'</td>';
-	print '<td align="center" width="20">&nbsp;</td>';
-	print '<td align="right" width="300">';
-	print ajax_constantonoff('SCRUM_SEE_DELIVERYDATE_PER_WEEK');
-	print '</td></tr>';
-
-	$var=!$var;
-	print '<tr '.$bc[$var].'>';
-	print '<td>'.$langs->trans("SetDeliveryDateByOtherTask").'</td>';
-	print '<td align="center" width="20">&nbsp;</td>';
-	print '<td align="right" width="300">';
-	print ajax_constantonoff('SCRUM_SET_DELIVERYDATE_BY_OTHER_TASK');
-	print '</td></tr>';
-
-	$var=!$var;
-	print '<tr '.$bc[$var].'>';
-	print '<td>'.$langs->trans("SetSCRUM_ALLOW_ALL_TASK_IN_GRID").'</td>';
-	print '<td align="center" width="20">&nbsp;</td>';
-	print '<td align="right" width="300">';
-	print ajax_constantonoff('SCRUM_ALLOW_ALL_TASK_IN_GRID');
-	print '</td></tr>';
-
-	$var=!$var;
-	print '<tr '.$bc[$var].'>';
-	print '<td>'.$langs->trans("SetSCRUM_ADD_TASKS_TO_GRID").'</td>';
-	print '<td align="center" width="20">&nbsp;</td>';
-	print '<td align="right" width="300">';
-	print ajax_constantonoff('SCRUM_ADD_TASKS_TO_GRID');
-	print '</td></tr>';
-
-	$var=!$var;
-	print '<tr '.$bc[$var].'>';
-	print '<td>'.$langs->trans("DefaultVelocity").'</td>';
-	print '<td align="center" width="20">&nbsp;</td>';
-	print '<td align="right" width="300">';
-	print '<form method="POST" action="'.$_SERVER['PHP_SELF'].'">';
-	print '<input type="hidden" name="token" value="'.$_SESSION['newtoken'].'">';
-	print '<input type="hidden" name="action" value="set_SCRUM_DEFAULT_VELOCITY">';
-	print '<input type="text" name="SCRUM_DEFAULT_VELOCITY" value="'.$conf->global->SCRUM_DEFAULT_VELOCITY.'" size="3" />&nbsp;';
-	print '<input type="submit" class="button" value="'.$langs->trans("Modify").'">';
-	print '</form>';
-	print '</td></tr>';
-
-	$var=!$var;
-	print '<tr '.$bc[$var].'>';
-	print '<td>'.$langs->trans("NumberOfDayForVelocity").'</td>';
-	print '<td align="center" width="20">&nbsp;</td>';
-	print '<td align="right" width="300">';
-	print '<form method="POST" action="'.$_SERVER['PHP_SELF'].'">';
-	print '<input type="hidden" name="token" value="'.$_SESSION['newtoken'].'">';
-	print '<input type="hidden" name="action" value="set_SCRUM_VELOCITY_NUMBER_OF_DAY">';
-	print '<input type="text" name="SCRUM_VELOCITY_NUMBER_OF_DAY" value="'.$conf->global->SCRUM_VELOCITY_NUMBER_OF_DAY.'" size="3" />&nbsp;';
-	print '<input type="submit" class="button" value="'.$langs->trans("Modify").'">';
-	print '</form>';
-	print '</td></tr>';
 
 	$var=!$var;
 	print '<tr '.$bc[$var].'>';

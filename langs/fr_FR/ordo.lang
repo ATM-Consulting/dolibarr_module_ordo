@@ -1,12 +1,5 @@
-Module104210Name = Scrumboard
-Module104210Desc = Gestion de projet dans un scrumboard
-Ideas = Idées
-inProgress = En cours
-toDo = A faire
-finish = Terminées
-TimeAdded=Temps ajouté
-CurrentVelocity=Vélocité actuelle
-HoursPerDay=h par jour (sert de base de calcul aux dates de fin)
+Module104211Name = Ordo
+Module104211Desc = Ordonnanceur de production
 NumberOfWorkingHourInDay=Nombre d'heures travaillées dans la journée
 HourHeight=Taille d'une heure de travail
 EndedThe=terminée(s) probablement le

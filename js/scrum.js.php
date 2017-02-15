@@ -403,7 +403,7 @@ function create_task(id_projet) {
 function pop_time(id_project, id_task) {
 	
 	$.ajax({
-		url:"<?php echo dol_buildpath('/scrumboard/script/interface.php',1) ?>"
+		url:"<?php echo dol_buildpath('/ordo/script/interface.php',1) ?>"
 		,data:{
 			put:'set-user-task'
 			,taskid:id_task

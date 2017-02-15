@@ -1,5 +1,5 @@
 <?php
-class ActionsScrumboard
+class ActionsOrdo
 { 
      /** Overloading the doActions function : replacing the parent's function with the one below 
       *  @param      parameters  meta datas of the hook (context, etc...) 
@@ -18,7 +18,7 @@ class ActionsScrumboard
         {
         	?>
 				<tr>
-					<td>Fin de production prévisionnelle</td>
+					<td><?php echo $langs->trans('OrdoPrevDateEndProd') ?></td>
 					<td rel="date_fin_prod">
 				<?php
 				
@@ -68,7 +68,7 @@ class ActionsScrumboard
 				function simulOrdo(fk_object) {
 					$('td[rel="date_fin_prod"]').html("Patientez svp...");
 					$.ajax({
-						url:"<?php echo dol_buildpath('/scrumboard/script/interface.php', 1); ?>"
+						url:"<?php echo dol_buildpath('/ordo/script/interface.php', 1); ?>"
 						,data:{
 							get:'task-ordo-simulation'
 							,fk_object: fk_object
@@ -149,7 +149,7 @@ class ActionsScrumboard
 						var fk_project = $(this).val();
 						
 						$.ajax({
-							url:"<?php echo dol_buildpath('/scrumboard/script/interface.php',1) ?>"
+							url:"<?php echo dol_buildpath('/ordo/script/interface.php',1) ?>"
 							,data: {
 								get:"select-task"
 								,fk_task:<?php echo $fk_task ?>

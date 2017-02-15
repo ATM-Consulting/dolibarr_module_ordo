@@ -16,7 +16,7 @@
  */
 
 /**
- *	\file       /scrumboard/scrum.php
+ *	\file       /ordo/scrum.php
  *	\ingroup    projet
  *	\brief      Project card
  */
@@ -65,20 +65,20 @@
     $tile_mode = !isset($_SESSION['tile_mode']) ? 1 : $_SESSION['tile_mode'];
 	$day_height =  $hour_height * 7;
 
-	llxHeader('', $langs->trans('GridTasks') , '','',0,0, array('/scrumboard/js/scrum.js.php'));
+	llxHeader('', $langs->trans('GridTasks') , '','',0,0, array('/ordo/js/scrum.js.php'));
 
 	$form = new Form($db);
 
 ?>
-	<link rel="stylesheet" type="text/css" title="default" href="<?php echo dol_buildpath('/scrumboard/css/scrum.css',1) ?>">
+	<link rel="stylesheet" type="text/css" title="default" href="<?php echo dol_buildpath('/ordo/css/scrum.css',1) ?>">
 <?php
     if($hour_height<=10 || ($column_width<=100 && $column_width>0)) {
             
-        ?><link rel="stylesheet" type="text/css" title="default" href="<?php echo dol_buildpath('/scrumboard/css/scrum-small.css',1) ?>"><?php
+        ?><link rel="stylesheet" type="text/css" title="default" href="<?php echo dol_buildpath('/ordo/css/scrum-small.css',1) ?>"><?php
     }
 
 	if(!empty($tile_mode)) {
-		?><link rel="stylesheet" type="text/css" title="default" href="<?php echo dol_buildpath('/scrumboard/css/scrum-tile.css',1) ?>"><?php
+		?><link rel="stylesheet" type="text/css" title="default" href="<?php echo dol_buildpath('/ordo/css/scrum-tile.css',1) ?>"><?php
 	}
 
 ?>
@@ -96,7 +96,7 @@
                         <a  class="columnHeader columnHeaderMini <?php echo ($hour_height==50 ? 'columnSelectedValue' : '') ?>" href="?hour_height=50"><?php echo $langs->trans('Middle') ?></a> 
                         <a  class="columnHeader columnHeaderMini <?php echo ($hour_height==100 ? 'columnSelectedValue' : '') ?>" href="?hour_height=100"><?php echo $langs->trans('High') ?></a>
                         -
-                        <a  class="columnHeader columnHeaderMini <?php echo ($tile_mode==1 ? 'columnSelectedValue' : '') ?>" href="?tilemode=<?php echo ($tile_mode) ? 0 : 1;  ?>"><?php echo img_picto($langs->trans('TileModeSwitch'), 'tile@scrumboard') ?></a>
+                        <a  class="columnHeader columnHeaderMini <?php echo ($tile_mode==1 ? 'columnSelectedValue' : '') ?>" href="?tilemode=<?php echo ($tile_mode) ? 0 : 1;  ?>"><?php echo img_picto($langs->trans('TileModeSwitch'), 'tile@ordo') ?></a>
                         <br />
                         <?php echo $langs->trans('ColumnWidth') ?> : 
                         <a class="columnHeader columnHeaderMini <?php echo ($column_width==-1 ? 'columnSelectedValue' : '') ?>" href="?column_width=-1"><?php echo $langs->trans('Auto') ?></a> 

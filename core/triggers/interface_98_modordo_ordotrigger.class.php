@@ -33,7 +33,7 @@
 /**
  * Trigger class
  */
-class Interfacescrumboardtrigger
+class Interfaceordotrigger
 {
 
     private $db;
@@ -54,7 +54,7 @@ class Interfacescrumboardtrigger
             . "They are provided for tutorial purpose only.";
         // 'development', 'experimental', 'dolibarr' or version
         $this->version = 'development';
-        $this->picto = 'scrumboard@scrumboard';
+        $this->picto = 'ordo@ordo';
     }
 
     /**
@@ -122,7 +122,7 @@ class Interfacescrumboardtrigger
        	
 			if(empty($object->array_options['options_color'])) {
 				
-				dol_include_once('/scrumboard/lib/scrumboard.lib.php');
+				dol_include_once('/ordo/lib/ordo.lib.php');
 				
 				$object->array_options['options_color'] = '#'.scrumboard_random_color();
 				$object->update($user, 1);
@@ -138,7 +138,7 @@ class Interfacescrumboardtrigger
             if(!empty($conf->global->SCRUM_ADD_TASKS_TO_GRID)) {
                   $object->array_options['options_grid_use'] = 1;  
                   $object->update($user,1);
-	          $object->insertExtraFields();
+	          	  $object->insertExtraFields();
             }
             
             dol_syslog(
@@ -146,7 +146,7 @@ class Interfacescrumboardtrigger
             );
        }
 	   else if($action === 'ACTION_CREATE' || $action =='ACTION_MODIFY') {
-	   	
+	   	//TODO je ne sais pas si encore utile TO CHECK
 			$fk_task = 0;
 			
 			$object->fetchObjectLinked();
