@@ -12,10 +12,10 @@
 	
 	dol_include_once('/core/lib/date.lib.php');
 	
-	dol_include_once('/scrumboard/class/smallGeoffrey.class.php');
-	dol_include_once('/scrumboard/lib/scrumboard.lib.php');
+	dol_include_once('/ordo/class/smallGeoffrey.class.php');
+	dol_include_once('/ordo/lib/ordo.lib.php');
 	
 	$langs->load("projects");
 	$langs->load('companies');
-	$langs->load('scrumboard@scrumboard');
+	$langs->load('ordo@ordo');
 	

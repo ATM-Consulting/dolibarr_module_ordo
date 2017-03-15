@@ -113,10 +113,28 @@ function TOrdonnancement() {
 							
 						}
 						,dataType: 'json'
-					}).done(function() {
-						sortTask(wsid);
-						if(wsid!=old_wsid)order(old_wsid);
+					}).done(function(data) {
 						
+						var TWSid = [wsid];
+						if(TWSid.indexOf(old_wsid)) TWSid.push(old_wsid);
+						
+						var init_top = parseInt($("li#task-"+taskid).css('top'));
+						for(x in data) {
+						
+							taskid_l = data[x];
+							
+							wsid_l = $("li#task-"+taskid_l).attr("ordo-ws-id");
+							if(TWSid.indexOf(wsid_l)) TWSid.push(wsid_l);
+							
+							init_top++;
+							$("li#task-"+taskid_l).appendTo("ul#list-task-"+wsid).attr("ordo-ws-id",wsid).css('top',init_top);
+							
+						}
+						
+						for(x in TWSid) {
+							wsid = TWSid[x];
+							sortTask(wsid);
+						}
 					});
 						
 					
@@ -166,7 +184,10 @@ function TOrdonnancement() {
 		$li.find('[rel=ref]').html(task.ref)
 				.attr("href",'<?php echo dol_buildpath('/projet/tasks/task.php',1) ?>?id='+task.id+'&withproject=1');
 		$li.find('[rel=task-link]').after(' <a href="javascript:OrdoQuickEditTask('+task.id+'); "><?php echo img_picto('', 'uparrow'); ?></a>');
-		$li.find('[rel=project]').html(task.project.title);
+		
+		var project_title = (task.project) ? task.project.title : "undefined";
+		
+		$li.find('[rel=project]').html(project_title);
 
 		var duration = task.planned_workload;
 		var height = 1;
@@ -184,7 +205,7 @@ function TOrdonnancement() {
 		date=new Date(task.time_date_end * 1000);
 		if(task.time_date_end>0) $li.find('[rel=time-end]').html(date.toLocaleDateString());
 		
-		$li.find('header').html(task.project.title+' <span class="duration">'+(Math.round(duration / 3600 *100)/100)+'</span>h à <span class="progress">'+task.progress+'</span>%');
+		$li.find('header').html(project_title+' <span class="duration">'+(Math.round(duration / 3600 *100)/100)+'</span>h à <span class="progress">'+task.progress+'</span>%');
 	   
 	    $li.css('margin-bottom', Math.round( swap_time / nb_hour_per_day * height_day ));
 		$li.css('width', Math.round( (width_column*task.needed_ressource)-2 ));
@@ -195,7 +216,7 @@ function TOrdonnancement() {
 		
 		$li.css('height', ordo_height);
 		
-		if(task.project.array_options.options_color!=null) {
+		if(task.project && task.project.array_options.options_color!=null) {
 			$li.css('background-color', task.project.array_options.options_color);
 			$li.attr('ordo-project-color', task.project.array_options.options_color);
 		}
@@ -220,9 +241,21 @@ function TOrdonnancement() {
 		
 		$li.mouseenter(function() {
 			$(this).height($(this)[0].scrollHeight);
+			
+			var $sourceDiv =  $(this);
+			var $targetDiv = $("#task-"+$(this).attr('ordo-fktaskparent'));
+			
+			if($sourceDiv.length>0 && $targetDiv.length>0) {
+				if($('#container-svg-'+$(this).attr('id')).length == 0) {
+					$('body').append('<div id="container-svg-'+$(this).attr('id')+'" rel="container-svg" style="position:absolute;top:0;left:0;z-index: -1;opacity: 0.8; width:1px;height:1px;overflow:visible;"><svg stroke-dasharray="10,10" id="svg-'+$(this).attr('id')+'" width="0" height="0"  style="position:absolute;top:0;left:0;"><path id="path-'+$(this).attr('id')+'" d="M0 0" stroke="#000" fill="none" stroke-width="12px";/></div>');
+				}
+			/*	console.log('connectDiv',$sourceDiv,$targetDiv,$('#svg-'+$(this).attr('id')),$('#path-'+$(this).attr('id')));*/
+				connectElements( $('#svg-'+$(this).attr('id')), $('#path-'+$(this).attr('id')),$sourceDiv, $targetDiv);
+			}
 		})
 		.mouseleave(function() {
 			$(this).height($(this).attr('ordo-height'));
+			$('#container-svg-'+$(this).attr('id')).remove();
 		});
 		
 		
@@ -397,6 +430,8 @@ function TOrdonnancement() {
     var afterAnimationOrder=function() {
     	resizeUL();
     	ToggleProject(0,true);
+    	
+    	$("div[rel=container-svg]").remove();
     };
     
     var reOrderTaskWithConstraint = function() {
@@ -503,7 +538,7 @@ function TOrdonnancement() {
 		
 		date=new Date();
 		
-		var TJour = new Array( "Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi" );
+		var TJour = new Array( "<?php echo $langs->trans('Sunday') ?>", "<?php echo $langs->trans('Monday') ?>", "<?php echo $langs->trans('Tuesday') ?>", "<?php echo $langs->trans('Wednesday') ?>", "<?php echo $langs->trans('Thursday') ?>", "<?php echo $langs->trans('Friday') ?>", "<?php echo $langs->trans('Saturday') ?>" );
 		
 		for(i=0;i<max_height;i+=height_day) {
 			var dayBlock = '<div style="height:'+height_day+'px; top:'+i+'px; right:0;width:'+(width_column-5)+'px; border-bottom:1px solid black; text-align:right;position:absolute;z-index:0;" class="day_delim">'+TJour[date.getDay()]+' '+date.toLocaleDateString()+'&nbsp;</div>';	
@@ -528,7 +563,7 @@ function TOrdonnancement() {
 				if(empty($conf->global->SCRUM_HIDE_PROJECT_LIST_ON_THE_RIGHT)) { 
 			?>
 			
-				$('#list-projects').append('<li fk-project="'+idProject+'" id="project-'+idProject+'" class="project start" style="text-align:left; position:relative; padding:10px; top:'+(project.start - 20)+'px;float:left; height:'+(project.end - project.start)+'px; width:20px;border-radius: 20px 20px 8px 8px; margin-right:5px;" onclick="ToggleProject('+idProject+')"><span style="transform: rotate(90deg);transform-origin: left top 0;display:block; white-space:nowrap; margin-left:15px;"><a href="<?php echo dol_buildpath('/projet/'.((float)DOL_VERSION > 3.6 ? 'card.php' : 'fiche.php'),1) ?>?id='+idProject+'">'+project.name+'</a> '+project.progress+'%</span></li>');
+				$('#list-projects').append('<li fk-project="'+idProject+'" id="project-'+idProject+'" class="project start" style="text-align:left; position:relative; padding:10px; top:'+(project.start - 20)+'px;float:left; height:'+(project.end - project.start)+'px; width:15px;border-radius: 0; margin-right:5px;" onclick="ToggleProject('+idProject+')"><span style="transform: rotate(90deg);transform-origin: left top 0;display:block; white-space:nowrap; margin-left:15px;"><a href="<?php echo dol_buildpath('/projet/'.((float)DOL_VERSION > 3.6 ? 'card.php' : 'fiche.php'),1) ?>?id='+idProject+'">'+project.name+'</a> '+project.progress+'%</span></li>');
 			
 			<?php 
 				} 
@@ -542,11 +577,11 @@ function TOrdonnancement() {
 			}
 			else {
 				if(project.color!=null && project.color!='') {
-					$('#list-projects li[fk-project='+idProject+']').css('background', 'rgba(0, 0, 0, 0) linear-gradient(to bottom, #7cbc0a '+project.progress+'%, #666 '+(project.progress+1)+'%, #ccc '+(project.progress+2)+'%, '+project.color+' 100%) repeat scroll 0 0');
+					$('#list-projects li[fk-project='+idProject+']').css('background', project.color);
 					
 				}
 				else{
-					$('#list-projects li[fk-project='+idProject+']').css('background', 'rgba(0, 0, 0, 0) linear-gradient(to bottom, #7cbc0a '+project.progress+'%, #666 '+(project.progress+1)+'%, #ccc '+(project.progress+2)+'%, #ccc 100%) repeat scroll 0 0');
+					$('#list-projects li[fk-project='+idProject+']').css('background', '#ccc');
 					
 				}		
 				
@@ -573,7 +608,7 @@ TWorkstation = function() {
 };
 
 toggleWorkStation = function (fk_ws, justMe) {
-	
+	console.log(fk_ws, $('#columm-ws-'+fk_ws).is(':visible'));
 	if(justMe!=null && justMe == true) {
 	    $('div[id^="columm-ws-"]').hide();
 	    $('#columm-ws-'+fk_ws).show();
@@ -581,7 +616,7 @@ toggleWorkStation = function (fk_ws, justMe) {
         $('#columm-header1-'+fk_ws).removeClass('hiddenWS');
 	}
 	else if($('#columm-ws-'+fk_ws).is(':visible')) {
-		$('#columm-wsordoQuickEditTask-'+fk_ws).hide();
+		$('#columm-ws-'+fk_ws).hide();
 		$('#columm-header1-'+fk_ws).addClass('hiddenWS');
 	}
 	else{
@@ -625,10 +660,10 @@ printWorkStation = function (fk_ws) {
 		
 	});
 	
-	$('<iframe id="printedFrame" name="printedFrame">').appendTo("body").ready(function(){
+	$('<iframe id="printedFrame" name="printedFrame" style="visibility:hidden;">').appendTo("body").ready(function(){
 	    setTimeout(function(){
-	    	
-	    	$('#printedFrame').contents().find('body').append('<link rel="stylesheet" type="text/css" title="default" href="<?php echo dol_buildpath('/scrumboard/css/scrum.css',2) ?>">');
+	    	console.log($('#printedFrame').contents().find('body'));
+	    	$('#printedFrame').contents().find('head').append('<link rel="stylesheet" type="text/css" title="default" href="<?php echo dol_buildpath('/ordo/css/scrum.css',2) ?>">');
 	    	$('#printedFrame').contents().find('body').append($("#printedTask"));
 	        window.frames["printedFrame"].focus();
 			window.frames["printedFrame"].print();
@@ -644,7 +679,7 @@ ToggleProject = function(fk_project, showAll) {
 	
 	$('li[task-id]').each(function(i,item) {
     	$li = $(item);
-    	$li.fadeTo(400,1);
+    	$li.css("opacity",1);
  	});
 	 	
 	if(fk_project==0) {
@@ -658,7 +693,7 @@ ToggleProject = function(fk_project, showAll) {
 		
 		$('li[task-id][ordo-fk-project!='+fk_project+']').each(function(i,item) {
 	    	$li = $(item);
-	    	$li.fadeTo(400,.2);
+	    	$li.css("opacity",.2);
 	 	});
 		
 	}
@@ -732,10 +767,11 @@ OrdoSplitTask = function(taskid, min, max) {
                        
                    } 
                 }).done(function(task) {
+                	console.log(task);
                     document.ordo.addTask(task);
                     
                     $li = $('li#task-'+taskid);
-                    document.ordo.order( $li.attr("ordo-ws-id"), $li.attr("ordo-needed-ressource")  );
+                    document.ordo.Order( $li.attr("ordo-ws-id"), $li.attr("ordo-needed-ressource")  );
                 });  
                   
                 $( this ).dialog( "close" );
@@ -771,3 +807,30 @@ OrdoReorderAll = function() {
     	
     	alert('OrdoReorderAll, pas écrit ça !');
 };
+
+
+function testLoginStatus() {
+	
+	$.ajax({
+		url: "script/interface.php",
+		dataType: "html",
+		crossDomain: true,
+		data: {
+			   get:'logged-status'
+		}
+	})
+	.then(function (data){
+		
+		if(data!='ok') {
+			document.location.href = document.location.href; // reload car la session est expirée		
+		}
+		else {
+			setTimeout(function() {
+			      testLoginStatus();
+			}, 10000);
+		}
+		
+	});
+
+}
+

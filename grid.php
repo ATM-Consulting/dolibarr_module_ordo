@@ -16,7 +16,7 @@
  */
 
 /**
- *	\file       /scrumboard/scrum.php
+ *	\file       /ordo/scrum.php
  *	\ingroup    projet
  *	\brief      Project card
  */
@@ -33,7 +33,7 @@
 	);*/
 	
 	$TWorkstation = array(
-        0=>array('nb_ressource'=>1, 'velocity'=>1, 'background'=>'linear-gradient(to right,white, #ccc)', 'name'=>'Non ordonnancé','id'=>0) // base de 7h par jour
+        0=>array('nb_ressource'=>1, 'velocity'=>1, 'background'=>'#FFEBD9', 'name'=>'Non ordonnancé','id'=>0) // base de 7h par jour
     );
 	
     if($conf->workstation->enabled) {
@@ -57,22 +57,29 @@
     $cw =  GETPOST('column_width');
     if(!empty($cw)) $_SESSION['column_width'] = (int)$cw;
     
-    $hour_height = empty($_SESSION['hour_height']) ? 50 : $_SESSION['hour_height'];
-    $column_width = empty($_SESSION['column_width']) ? 200 : $_SESSION['column_width'];
+	$tm = GETPOST('tilemode');
+	if($tm!=='') $_SESSION['tile_mode'] = (int)$tm;
 	
+    $hour_height = empty($_SESSION['hour_height']) ? 50 : $_SESSION['hour_height'];
+    $column_width = empty($_SESSION['column_width']) ? -1 : $_SESSION['column_width'];
+    $tile_mode = !isset($_SESSION['tile_mode']) ? 1 : $_SESSION['tile_mode'];
 	$day_height =  $hour_height * 7;
 
-	llxHeader('', $langs->trans('GridTasks') , '','',0,0, array('/scrumboard/js/scrum.js.php'));
+	llxHeader('', $langs->trans('GridTasks') , '','',0,0, array('/ordo/js/scrum.js.php'));
 
 	$form = new Form($db);
 
 ?>
-	<link rel="stylesheet" type="text/css" title="default" href="<?php echo dol_buildpath('/scrumboard/css/scrum.css',1) ?>">
+	<link rel="stylesheet" type="text/css" title="default" href="<?php echo dol_buildpath('/ordo/css/scrum.css',1) ?>">
 <?php
-    if($hour_height<=10 || $column_width<=100) {
+    if($hour_height<=10 || ($column_width<=100 && $column_width>0)) {
             
-        ?><link rel="stylesheet" type="text/css" title="default" href="<?php echo dol_buildpath('/scrumboard/css/scrum-small.css',1) ?>"><?php
+        ?><link rel="stylesheet" type="text/css" title="default" href="<?php echo dol_buildpath('/ordo/css/scrum-small.css',1) ?>"><?php
     }
+
+	if(!empty($tile_mode)) {
+		?><link rel="stylesheet" type="text/css" title="default" href="<?php echo dol_buildpath('/ordo/css/scrum-tile.css',1) ?>"><?php
+	}
 
 ?>
 		<div class="content">
@@ -81,35 +88,38 @@
 				<tr>
 					<td style="position:relative;">
 						<div class="loading-ordo"><img src="./img/loading.gif" /></div>
-					    <?php echo $langs->trans('WorkStation') ?> - <?php echo ($number_of_columns-1).' '.$langs->trans('NumberOfQueue'); ?>
-					    <br />
+					    <!-- <?php echo $langs->trans('WorkStation') ?> - <?php echo ($number_of_columns-1).' '.$langs->trans('NumberOfQueue'); ?>
+					    <br /> -->
                         <?php echo $langs->trans('HourHeight') ?> : 
-                        <a class="columnHeader columnHeaderMini" href="?hour_height=5"><?php echo $langs->trans('TooSmall') ?></a> 
-                        <a class="columnHeader  columnHeaderMini" href="?hour_height=10"><?php echo $langs->trans('Small') ?></a> 
-                        <a  class="columnHeader columnHeaderMini" href="?hour_height=50"><?php echo $langs->trans('Middle') ?></a> 
-                        <a  class="columnHeader columnHeaderMini" href="?hour_height=100"><?php echo $langs->trans('High') ?></a>
+                        <a class="columnHeader columnHeaderMini <?php echo ($hour_height==5 ? 'columnSelectedValue' : '') ?>" href="?hour_height=5"><?php echo $langs->trans('TooSmall') ?></a> 
+                        <a class="columnHeader  columnHeaderMini <?php echo ($hour_height==10 ? 'columnSelectedValue' : '') ?>" href="?hour_height=10"><?php echo $langs->trans('Small') ?></a> 
+                        <a  class="columnHeader columnHeaderMini <?php echo ($hour_height==50 ? 'columnSelectedValue' : '') ?>" href="?hour_height=50"><?php echo $langs->trans('Middle') ?></a> 
+                        <a  class="columnHeader columnHeaderMini <?php echo ($hour_height==100 ? 'columnSelectedValue' : '') ?>" href="?hour_height=100"><?php echo $langs->trans('High') ?></a>
+                        -
+                        <a  class="columnHeader columnHeaderMini <?php echo ($tile_mode==1 ? 'columnSelectedValue' : '') ?>" href="?tilemode=<?php echo ($tile_mode) ? 0 : 1;  ?>"><?php echo img_picto($langs->trans('TileModeSwitch'), 'tile@ordo') ?></a>
                         <br />
                         <?php echo $langs->trans('ColumnWidth') ?> : 
-                        <a class="columnHeader columnHeaderMini" href="?column_width=50"><?php echo $langs->trans('TooSmall') ?></a> 
-                        <a class="columnHeader columnHeaderMini" href="?column_width=100"><?php echo $langs->trans('Small') ?></a> 
-                        <a  class="columnHeader columnHeaderMini" href="?column_width=200"><?php echo $langs->trans('Middle') ?></a> 
-                        <a  class="columnHeader columnHeaderMini" href="?column_width=400"><?php echo $langs->trans('High') ?></a>
-                        <br />
+                        <a class="columnHeader columnHeaderMini <?php echo ($column_width==-1 ? 'columnSelectedValue' : '') ?>" href="?column_width=-1"><?php echo $langs->trans('Auto') ?></a> 
+                        <a class="columnHeader columnHeaderMini <?php echo ($column_width==50 ? 'columnSelectedValue' : '') ?>" href="?column_width=50"><?php echo $langs->trans('TooSmall') ?></a> 
+                        <a class="columnHeader columnHeaderMini <?php echo ($column_width==100 ? 'columnSelectedValue' : '') ?>" href="?column_width=100"><?php echo $langs->trans('Small') ?></a> 
+                        <a  class="columnHeader columnHeaderMini <?php echo ($column_width==200 ? 'columnSelectedValue' : '') ?>" href="?column_width=200"><?php echo $langs->trans('Middle') ?></a> 
+                        <a  class="columnHeader columnHeaderMini <?php echo ($column_width==400 ? 'columnSelectedValue' : '') ?>" href="?column_width=400"><?php echo $langs->trans('High') ?></a>
+                        <div id="ws-list-top">
 					    <?php
 					    echo $langs->trans('Workstations').' : ';
                         
 					    foreach($TWorkstation as $w_id=>$w_param) {
 					        
-                            ?><span class="columnHeader columnHeaderMini" id="columm-header1-<?php echo $w_id; 
+                            ?><span class="columnHeader columnHeaderMini" id="columm-header1-<?php echo $w_id;  
                             ?>"><a href="javascript:toggleWorkStation(<?php echo $w_id; ?>)"><?php 
                             	echo $w_param['name'].($w_param['velocity']!=1 ? ' '.round($w_param['velocity']*100).'%' : ''); ?></a>
                                 <a title="Juste cette colonne" href="javascript:toggleWorkStation(<?php echo $w_id; ?>, true)">(+)</a>
                                 <a href="javascript:printWorkStation(<?php echo $w_id; ?>);"><?php echo img_printer(); ?></a>
                             </span><?php
                         }
-                        
                      /*   ?><a href="javascript:OrdoReorderAll();" class="columnHeader"><?php echo $langs->trans('Refresh'); ?></a><?php */
 					    ?>
+                        </div>
 					    
 					</td>
 				</tr>
@@ -120,12 +130,18 @@
 						
 						_draw_grid($TWorkstation, $column_width);
 						
+						if(empty($conf->global->SCRUM_HIDE_PROJECT_LIST_ON_THE_RIGHT)) {
+						
 						?>
 						<div class="projects" style="float:left;">
 						    <ul style="position:relative;width:200px; top:38px;" id="list-projects" class="task-list needToResize" >
                         
                             </ul>
 						</div>
+						
+						<?php 
+						}
+						?>
 					</td>
 				</tr>
 			</table>
@@ -142,6 +158,21 @@ function _order_by_name(&$a, &$b) {
 }
 function _js_grid(&$TWorkstation, $day_height, $column_width) {
     global $conf;
+    
+     $TWSVisible=array();
+   	 if(!empty($_COOKIE['WSTogle'])) {
+   	 	foreach($_COOKIE['WSTogle'] as $wsid=>$visible) {
+   	 		$TWorkstation[$wsid]['visible'] = $visible;
+   	 	}
+   	 }
+    
+   	 $nb_ressource_total = 0;
+    foreach($TWorkstation as &$ws) { 
+    	if(!isset($ws['visible']) || !empty($ws['visible'])) {
+    		$nb_ressource_total+=(!empty($ws['nb_ressource']) ? $ws['nb_ressource'] : 1 );
+    	}
+    }
+    
 		?>		
 		        <script type="text/javascript">
 		            var http = "<?php echo DOL_URL_ROOT; ?>";
@@ -150,14 +181,29 @@ function _js_grid(&$TWorkstation, $day_height, $column_width) {
 		            var TDayOff = new Array( <?php echo $conf->global->TIMESHEET_DAYOFF; ?> );
 		        </script>
 		        <script type="text/javascript" src="./js/ordo.js.php"></script>
-                <script type="text/javascript" src="./js/makefixed.js"></script>
-                <script type="text/javascript">
+	            <script type="text/javascript" src="./js/makefixed.js"></script>
+	            <script type="text/javascript" src="./js/svg.js"></script>
+	            
+        	        <script type="text/javascript">
 				var TVelocity = [];
 				
 				document.ordo = {};
-				
+
+				if(w_column == -1) {
+					w_column = parseInt(($( window ).width() - $('#id-left').width() - 50) / <?php echo $nb_ressource_total + (empty($conf->global->SCRUM_HIDE_PROJECT_LIST_ON_THE_RIGHT) ? 2 : 0); ?>);
+					$('div.columnordo').each(function(i,item) {
+						$item = $(item);
+						var nb_r = $item.attr('ws-nb-ressource'); 
+						$item.css('width', w_column*nb_r);
+						
+						$item.find('ul').css('width', w_column*nb_r);	
+					});
+					
+					
+				}
 				$(document).ready(function(){
-				
+  					$('#ws-list-top').width($( window ).width());
+
 				     document.ordo = new TOrdonnancement();
 					 
 					 <?php
@@ -207,7 +253,7 @@ function _draw_grid(&$TWorkstation, $column_width) {
 		$w_column = $column_width*$w_param['nb_ressource'];
 		
 		$width_table+=$w_column;	
-		?><div id="columm-ws-<?php echo $w_id; ?>" valign="top" style="float:left;margin-right: 5px; width:<?php echo round($w_column); ?>px; <?php echo $back; ?> border:1px solid #666;z-index:1;">
+		?><div class="columnordo" id="columm-ws-<?php echo $w_id; ?>" valign="top" style="float:left;margin-right: 5px; width:<?php echo round($w_column); ?>px; <?php echo $back; ?> border-right:2px solid #ddd;z-index:1;"  ws-nb-ressource="<?php echo $w_param['nb_ressource']; ?>">
 		        <div style="width:<?php echo $column_width ?>px; z-index:1;">
 		        	<span class="fixedHeader columnHeader">
 		        		<a href="javascript:toggleWorkStation(<?php echo $w_id; ?>)" ws-id="<?php echo $w_id; ?>"><?php echo $w_param['name'].($w_param['velocity'] != 1 ? ' '.round($w_param['velocity']*100).'%' : ''); ?></a>
@@ -233,12 +279,12 @@ function _draw_grid(&$TWorkstation, $column_width) {
 	
 	
 	?>
-<div>
+<!--  <div>
 	<span style="background-color:red;">&nbsp;&nbsp;&nbsp;&nbsp;</span> <?php echo $langs->trans('TaskWontfinishInTime'); ?><br />
 	<span style="background-color:orange;">&nbsp;&nbsp;&nbsp;&nbsp;</span> <?php echo $langs->trans('TaskMightNotfinishInTime'); ?><br />
 	<span style="background-color:#CCCCCC;">&nbsp;&nbsp;&nbsp;&nbsp;</span> <?php echo $langs->trans('BarProgressionHelp'); ?>
 	
-</div>
+</div> -->
 
 		
 		</div>
@@ -251,7 +297,7 @@ function _draw_grid(&$TWorkstation, $column_width) {
 				<div rel="content">
     				<span rel="project" style="display:none;"></span> <span rel="task-link">[<a href="#" rel="ref"> </a>] <span rel="label" class="classfortooltip" title="">label</span></span>
     				<div rel="divers"></div>
-                    <div rel="time-projection"></div>
+                    <div rel="time-projection" <?php echo empty($conf->global->SCRUM_SHOW_SHOW_ESTIMATED_START_END) ? 'style="display:none"': ''; ?>></div>
                     <div rel="time-rest"></div>
                     <div rel="users"></div>
     				<div rel="time-end"></div>

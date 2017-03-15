@@ -14,17 +14,16 @@ class TSmallGeoffrey {
         $this->debug = false;
     }
 
-	function getMinY($fk_task_parent) {
-	    global $db; 
+    function getMinY($fk_task_parent) {
+	global $db, $conf; 
 	    
         $yMin = 0; 
-        
         if($fk_task_parent>0) {
 	        // dans la même file ? 
 	        foreach($this->TBox as &$box) {
 	            if($box->taskid == $fk_task_parent) {
 	                $yMin = $box->top + $box->height ;
-                    break;
+                    	break;
 	            }
 	        }
 	    
@@ -32,7 +31,10 @@ class TSmallGeoffrey {
                 $sql = "SELECT t.grid_row,t.grid_height,t.planned_workload,t.progress,tex.fk_workstation 
                     FROM ".MAIN_DB_PREFIX."projet_task t 
                     LEFT JOIN ".MAIN_DB_PREFIX."projet_task_extrafields tex ON (t.rowid=tex.fk_object)
-                    WHERE t.rowid = ".$fk_task_parent." AND t.progress<100 AND tex.grid_use = 1";
+                    WHERE t.rowid = ".$fk_task_parent." AND t.progress<100 AND t.planned_workload>0";
+
+				if(empty($conf->global->SCRUM_ALLOW_ALL_TASK_IN_GRID)) $sql.=" AND tex.grid_use = 1";
+
                 $res = $db->query($sql);    
                 
                 $obj = $db->fetch_object($res);
@@ -43,12 +45,12 @@ class TSmallGeoffrey {
             }
 	           
             
-	    }
-	    
-	    return array($yMin,0);
 	}
+	    
+	return array($yMin,0);
+    }
 
-    function addBox($top,$left,$height,$width, $taskid=0, $fk_task_parent=0) {
+    function addBox($top,$left,$height,$width, $taskid=0, $fk_task_parent=0, $TUser=array()) {
         
         $box = new stdClass;
         $box->top = $top;
@@ -57,6 +59,7 @@ class TSmallGeoffrey {
         $box->width = $width;
         $box->taskid = $taskid;
         $box->fk_task_parent = $fk_task_parent;
+        $box->$TUser = $TUser;
         
         $this->TBox[] = $box;
         
@@ -254,4 +257,53 @@ class TSmallGeoffrey {
         
     }
     
+	static function setTaskWS(&$TIdTask, $taskid,$fk_workstation , $lvl = 0) {
+	  global $db,$conf;
+	
+		  if($lvl>50) return array( );
+
+		  $resultset = $db->query("SELECT t.fk_projet as fk_project, t.grid_col,t.grid_row,t.grid_height,tex.fk_workstation
+			FROM ".MAIN_DB_PREFIX."projet_task t LEFT JOIN ".MAIN_DB_PREFIX."projet_task_extrafields tex ON (tex.fk_object = t.rowid)
+			WHERE t.rowid=".$taskid."");
+			
+		  $task = $db->fetch_object($resultset);
+	
+		  $sql = "UPDATE ".MAIN_DB_PREFIX."projet_task_extrafields SET
+	            fk_workstation=".(int)$fk_workstation."
+	        WHERE fk_object = ".(int)$taskid;
+	        $res = $db->query($sql);
+/*var_dump($db->affected_rows($res),$db);exit;
+		  if($db->affected_rows($res) == 0) {
+			$db->query("INSERT INTO ".MAIN_DB_PREFIX."projet_task_extrafields (fk_object, fk_workstation) VALUES (".$taskid.",".$fk_workstation.")");
+var_dump($db);TODO ne détecte pas que l'extrafield n'est pas inséré pour les anciennes tâche pré-ordo 
+		  }*/
+
+		  $TIdTask[]=$taskid;
+		  
+		  if(!empty($conf->global->SCRUM_SNAP_MODE) && $conf->global->SCRUM_SNAP_MODE == 'SAME_PROJECT_AFTER') {
+		  	$task->grid_row = round($task->grid_row,5);
+			$task->grid_height = round($task->grid_height,5);
+			  
+			//var_dump($task->grid_row,$task->grid_row + $task->grid_height);
+				$res = $db->query("SELECT t.rowid FROM ".MAIN_DB_PREFIX."projet_task t 
+						LEFT JOIN ".MAIN_DB_PREFIX."projet_task_extrafields tex ON (tex.fk_object = t.rowid)
+						WHERE t.fk_projet=".$task->fk_project." AND tex.fk_workstation= ".$task->fk_workstation." 
+						AND t.grid_row>=".($task->grid_row-0.001)." AND t.grid_row<=".($task->grid_row + $task->grid_height + 0.001));
+						
+				while($obj = $db->fetch_object($res)) {
+				//	var_dump($obj->rowid,$TIdTask);
+					if(!in_array($obj->rowid, $TIdTask)) {
+						
+						$lvl++;
+						
+						self::setTaskWS($TIdTask,$obj->rowid, $fk_workstation, $lvl);
+						//exit;
+					}	
+				}
+				
+		  }
+		
+		  
+	}
+	
 }

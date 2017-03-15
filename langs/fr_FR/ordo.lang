@@ -1,12 +1,5 @@
-Module104210Name = Scrumboard
-Module104210Desc = Gestion de projet dans un scrumboard
-Ideas = Idées
-inProgress = En cours
-toDo = A faire
-finish = Terminées
-TimeAdded=Temps ajouté
-CurrentVelocity=Vélocité actuelle
-HoursPerDay=h par jour (sert de base de calcul aux dates de fin)
+Module104211Name = Ordo
+Module104211Desc = Ordonnanceur de production
 NumberOfWorkingHourInDay=Nombre d'heures travaillées dans la journée
 HourHeight=Taille d'une heure de travail
 EndedThe=terminée(s) probablement le
@@ -58,3 +51,15 @@ WhenBeginOrdo=Heure où débute l'ordonnancement
 WhenEndOrdo=Heure où fini l'ordonnancement
 SetSCRUM_ALLOW_ALL_TASK_IN_GRID=Ordonnancer toutes les tâches sans distinction
 hideProjectsOnTheRight=Masquer la liste des projets sur la droite de l'ordonnancement
+showLinkedContactToTask=Afficher les contacts liés
+
+#NOMBRE DE PROJETS PAR CHEF DE PROJET 
+graphProjectCDP=Nombre de projets par chef de projet
+
+SnapMode=Mode collant
+SnapTaskFromSameProjectAfter=Coller les tâches ultérieure du même projet
+
+RALLinkedToOrder=RAL liée à la commande
+showTaskWithoutDuration=Afficher les taches même si elles n'ont pas de durée plannifiée prévue
+
+SCRUM_SHOW_SHOW_ESTIMATED_START_END=Voir les dates estimées de début et fin dans l'ordo
