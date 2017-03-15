@@ -406,6 +406,7 @@ class modOrdo extends DolibarrModules
 				ADD date_estimated_start DATETIME NOT NULL 
 			  , ADD date_estimated_end DATETIME NOT NULL 
 			  , ADD INDEX (date_estimated_start, date_estimated_end)");
+					
 	
 		dol_include_once('/core/class/extrafields.class.php');
         $extrafields=new ExtraFields($this->db);
