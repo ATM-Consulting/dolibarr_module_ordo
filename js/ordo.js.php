@@ -573,10 +573,14 @@ function TOrdonnancement() {
 			?>	
 			
 			
-			if(project.hasLateTask) $('#list-projects li[fk-project='+idProject+']').addClass('projectLate');
-			else if(project.hasMaybeLateTask) $('#list-projects li[fk-project='+idProject+']').addClass('projectMaybeLate');
+			if(project.hasLateTask) {
+				$('#list-projects li[fk-project='+idProject+']').addClass('projectLate').css('background','');
+			}
+			else if(project.hasMaybeLateTask) {
+				$('#list-projects li[fk-project='+idProject+']').addClass('projectMaybeLate').css('background','');
+			}
 			else if(project.planned_workload < project.duration_effective){
-				 $('#list-projects li[fk-project='+idProject+']').addClass('projectMaybeLate');
+				 $('#list-projects li[fk-project='+idProject+']').addClass('projectMaybeLate').css('background','');
 			}
 			else {
 				if(project.color!=null && project.color!='') {
