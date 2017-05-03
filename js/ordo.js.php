@@ -555,9 +555,9 @@ function TOrdonnancement() {
 		}
 
 		$('#list-projects li').remove();
-		$('#list-projects').css("width", TProject.length * 40);
+		/*$('#list-projects').css("width", TProject.length * 40);
 		$('td.projects').css("width", TProject.length * 40);
-		
+		*/
 		for(idProject in TProject) {
 
 			project = TProject[idProject];
@@ -593,10 +593,12 @@ function TOrdonnancement() {
 		}
 		
 		wtable=0;
-		$("#theGrid div").each(function() {
+		$("#theGrid>div").each(function() {
 		    wtable+=parseInt($(this).css('width'))+5;
+//		console.log($(this), $(this).css('width'));
+
 		});
-    	$("#theGrid").css("min-width", wtable);
+    		$("#theGrid").css("min-width", wtable);
     	
     };
     
