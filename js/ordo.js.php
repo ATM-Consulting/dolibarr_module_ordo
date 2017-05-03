@@ -390,9 +390,12 @@ function TOrdonnancement() {
 				if(task.date_end>0) {
 					if(task.time_estimated_end > task.date_end) {
 						$('li[task-id='+task.id+']').addClass('taskLate');
+						$('li[task-id='+task.id+']').css("background-color", "");
 					}
 					else if(task.time_estimated_end > task.date_end - 86400) {
 						$('li[task-id='+task.id+']').addClass('taskMaybeLate');
+						$('li[task-id='+task.id+']').css("background-color", "");
+
 					}
 					
 				}

@@ -254,10 +254,10 @@ class modOrdo extends DolibarrModules
       $this->menu[$r]=array(   'fk_menu'=>'fk_mainmenu=of,fk_leftmenu=ordoGPAO',     // Use r=value where r is index key used for the parent menu entry (higher parent must be a top menu entry)
             'type'=>'left',         // This is a Left menu entry
             'titre'=>'OrdonnancementStat',
-            'mainmenu'=>'ordoGPAO',
+            'mainmenu'=>'of',
             'leftmenu'=>'ordoStat',
             'url'=>'/ordo/grid-stat.php',
-            'position'=>300,
+            'position'=>310,
             'perms'=>'$user->rights->ordo->ordo',
             'lang'=>'ordo@ordo',
             'target'=>'',
