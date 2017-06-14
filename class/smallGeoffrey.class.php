@@ -290,47 +290,16 @@ class TSmallGeoffrey {
     			
     			if($box->type!=='off') continue;
     			
-    			if( $box->left + $box->width > $x && $box->left<=$x ) {
-    				//var_dump($box, '<hr>');
-    				// boite au dessus ou au dessous ?
-    				if($box->top + $box->height<=$y && $box->top + $box->height>$y_before){
-    					$y_before = $box->top + $box->height;
+    			if( $box->left< $x+$w && $box->left+$box->width>=$x ) {
+    				
+    				if($box->top<$y+$h && $box->top+$box->height>=$y ) {
+    					$h+=$box->height; // cette boîte est sous la nouvelle boîte
     				}
-    				else if($box->top >= $y && ($box->top < $y_after || $y_after ===  false) ){
-    					$y_after = $box->top;
-    				}
+    				
     				
     			}
-    			
-    			if($box->top + $box->height>$y && $box->top<=$y) {
-    				
-    				if($box->left + $box->width >= $x && $box->left < $x && $box->left + $box->width  > $x_before ){
-    					$x_before = $box->left + $box->width;
-    					
-    					if($this->debug){
-    						print "(".($box->left + $box->width).") x_before = $x_before;";
-    						var_dump($box);}
-    						
-    				}
-    				else if($box->left > $x && $box->left < $x_after){
-    					$x_after = $box->left;
-    					if($this->debug){
-    						print "({$box->left}) x_after= $x_after;";
-    						var_dump($box);}
-    						
-    				}
-    			}
-    			
-    			if(( $y_after!==false && $y_after - $y_before < $h) || $x_after - $x_before < $w) {
-    				if($y_first_block_not_enougth_large === false || $y_after>$y_first_block_not_enougth_large) {
-    					$y_first_block_not_enougth_large = $y_after;
-    				}
-    				
-    				$h+=$box->height;
-    				
-    			} 
-    			
     		}
+    		
     	}
     }
     
