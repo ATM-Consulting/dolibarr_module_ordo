@@ -268,8 +268,14 @@ function showParameters() {
     print '<input type="submit" class="button" value="'.$langs->trans("Modify").'">';
 	print '</form>';
 	
-
-
+	$var=!$var;
+	print '<tr '.$bc[$var].'>';
+	print '<td>'.$langs->trans("ORDO_ELASTIC_TASK").'</td>';
+	print '<td align="center" width="20">&nbsp;</td>';
+	print '<td align="right" width="300">';
+	print ajax_constantonoff('ORDO_ELASTIC_TASK');
+	print '</td></tr>';
+	
 	$var=!$var;
 	print '<tr '.$bc[$var].'>';
 	print '<td>'.$langs->trans("SCRUM_SHOW_SHOW_ESTIMATED_START_END").'</td>';
