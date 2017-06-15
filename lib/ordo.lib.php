@@ -360,7 +360,7 @@ function _ordo_ido_get($time_off_start, $day_moment, $nb_ressource, $time_init, 
     
 }
 
-function _ordo_init_dayOff(&$smallGeoffrey, $fk_workstation, $time_init, $time_day, $nb_second_in_hour, $velocity) {
+function _ordo_init_dayOff(TSmallGeoffrey &$smallGeoffrey, $fk_workstation, $time_init, $time_day, $nb_second_in_hour, $velocity) {
     global $conf;	
 		
     $TOff = array();
@@ -393,8 +393,8 @@ function _ordo_init_dayOff(&$smallGeoffrey, $fk_workstation, $time_init, $time_d
     //var_dump($height_of_past_day, $nb_second_in_hour);exit;
     
     if($height_of_past_day>0) {
-    	$smallGeoffrey->addBox(0, 0,  $height_of_past_day , $ws->nb_ressource);
-    	$TOff[] = array('top'=>0,'left'=>0,'height'=>$height_of_past_day,'nb_ressource'=>$ws->nb_ressource, 'class'=>'past','title'=>$fk_workstation.'. Passé'); 
+    	$smallGeoffrey->addBox(0, 0,  $height_of_past_day , $ws->nb_ressource,0,0,array(),'past');
+    	$TOff[] = array('top'=>0,'left'=>0,'height'=>$height_of_past_day,'nb_ressource'=>$ws->nb_ressource, 'class'=>'past','title'=>''); 
 	}
   //  var_dump($height_of_past_day,$smallGeoffrey );
     
@@ -407,7 +407,7 @@ function _ordo_init_dayOff(&$smallGeoffrey, $fk_workstation, $time_init, $time_d
             
            $TRow = _ordo_ido_get($sc->date_off, $sc->day_moment, $sc->nb_ressource, $time_init, $nb_second_in_hour);
            $TOff[]=$TRow;  
-           $smallGeoffrey->addBox($TRow['top'], $TRow['left'], $TRow['height'], $TRow['nb_ressource']);
+           $smallGeoffrey->addBox($TRow['top'], $TRow['left'], $TRow['height'], $TRow['nb_ressource'],0,0,array(),'off');
            
         }     
         else{
@@ -455,7 +455,7 @@ function _ordo_init_dayOff(&$smallGeoffrey, $fk_workstation, $time_init, $time_d
         }
         if(!empty($TRow)) {
            $TOff[]=$TRow;  
-           $smallGeoffrey->addBox($TRow['top'], $TRow['left'], $TRow['height'], $TRow['nb_ressource']);
+           $smallGeoffrey->addBox($TRow['top'], $TRow['left'], $TRow['height'], $TRow['nb_ressource'],0,0,array(),'off');
         }
         
         $t_current = strtotime('+1day', $t_current);   

@@ -50,7 +50,7 @@ class TSmallGeoffrey {
 	return array($yMin,0);
     }
 
-    function addBox($top,$left,$height,$width, $taskid=0, $fk_task_parent=0, $TUser=array()) {
+    function addBox($top,$left,$height,$width, $taskid=0, $fk_task_parent=0, $TUser=array(), $type='') {
         
         $box = new stdClass;
         $box->top = $top;
@@ -60,6 +60,7 @@ class TSmallGeoffrey {
         $box->taskid = $taskid;
         $box->fk_task_parent = $fk_task_parent;
         $box->$TUser = $TUser;
+        $box->type = $type;
         
         $this->TBox[] = $box;
         
@@ -94,7 +95,9 @@ class TSmallGeoffrey {
     
     }
         
-    function noBoxeHere($y,$x, $TBox = array()) {
+    function noBoxeHere($y,$x, $TBox = array(), $includeAll=false) {
+    	global $conf;
+    	
         if($this->debug) {
             print '<hr>noBoxeHere('.$y.','.$x.')';
             var_dump($TBox);
@@ -104,6 +107,12 @@ class TSmallGeoffrey {
         
         foreach($TBox as &$box) {
             
+        	if(!empty($conf->global->ORDO_ELASTIC_TASK) && !$includeAll) {
+        		if($box->type === 'off') {
+        			continue;
+        		}
+        	}
+        	
             if($box->left<=$x && $box->left + $box->width > $x && $box->top<=$y && $box->top + $box->height>$y ) { // il y a une boite ici
                 if($this->debug){ print " y a déjà une boite là !";
                     var_dump($box);}
@@ -117,7 +126,8 @@ class TSmallGeoffrey {
         
     }   
         
-    function isLargeEnougthEmptyPlace($y,$x, $h, $w, &$y_first_block_not_enougth_large) {
+    function isLargeEnougthEmptyPlace($y,$x, &$h, $w, &$y_first_block_not_enougth_large) {
+    	global $conf;
         if($this->debug) {print "<br />
         isLargeEnougthEmptyPlace($y,$x, $h, $w);";}
         
@@ -128,7 +138,11 @@ class TSmallGeoffrey {
 
         foreach($this->TBox as &$box) {
             
-            if( $box->left + $box->width > $x && $box->left<=$x ) {
+        	if(!empty($conf->global->ORDO_ELASTIC_TASK) && $box->type === 'off') {
+        		continue;
+        	}
+        	
+        	if( $box->left + $box->width > $x && $box->left<=$x ) {
             	//var_dump($box, '<hr>');
                 // boite au dessus ou au dessous ?
                 if($box->top + $box->height<=$y && $box->top + $box->height>$y_before){
@@ -169,7 +183,9 @@ class TSmallGeoffrey {
                     
                 }
                    
-				return false; // pas assez de place
+                return false; // pas assez de place
+                
+				
             } 
         }
         if($this->debug) print "<br />Assez Grand($y,$x, $h, $w => $y_before, $y_after, $x_before, $x_after)";
@@ -218,10 +234,13 @@ class TSmallGeoffrey {
                   $empty_place = true;
                   if($this->isLargeEnougthEmptyPlace($y,$x, $h, $w, $y_first_block_not_enougth_large)) {
                         if($this->debug) print '...trouvé ('.$y.','.$x.') !<br />';    
+                        $this->correctBoxHeight($y,$x, $h, $w, $TBox);
+                        	
                       return array($x,$y, $h); 
                       
                   }
-                  
+                
+                 
                }
                
            } 
@@ -255,6 +274,33 @@ class TSmallGeoffrey {
            
         }
         
+    }
+    
+    private function correctBoxHeight($y,$x, &$h, $w, &$TBox) {
+    	global $conf;
+    	
+    	if(!empty($conf->global->ORDO_ELASTIC_TASK)) {
+    		
+    		$y_before = $y;
+    		$y_after = false;
+    		$x_before = 0;
+    		$x_after = $this->width;
+    		
+    		foreach($this->TBox as &$box) {
+    			
+    			if($box->type!=='off') continue;
+    			
+    			if( $box->left< $x+$w && $box->left+$box->width>=$x ) {
+    				
+    				if($box->top<$y+$h && $box->top+$box->height>=$y ) {
+    					$h+=$box->height; // cette boîte est sous la nouvelle boîte
+    				}
+    				
+    				
+    			}
+    		}
+    		
+    	}
     }
     
 	static function setTaskWS(&$TIdTask, $taskid,$fk_workstation , $lvl = 0) {
