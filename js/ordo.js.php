@@ -32,7 +32,9 @@ function TOrdonnancement() {
  	   	}	
  	   });
 
-       
+       /*
+       Get list of orderable task
+       */
        $.ajax({
 			url : "./script/interface.php"
 			,data: {
@@ -55,6 +57,9 @@ function TOrdonnancement() {
 
 			$('*.classfortooltip').tipTip({maxWidth: "600px", edgeOffset: 10, delay: 50, fadeIn: 50, fadeOut: 50});
 			
+			/* 
+			set task dragabble for workstation to other or in time
+			*/ 
 			$('.connectedSortable>li').draggable({ 
 				snap: true
 				,containment: "table#scrum td#tasks table"
@@ -148,6 +153,9 @@ function TOrdonnancement() {
        
     };
     
+    /*
+    put sort to db
+    */
     var sortTask = function(wsid, notReOrderAfter) {
     	var TTaskID=[];
 		$('ul li[ordo-ws-id='+wsid+']').each(function(i,item){
@@ -173,6 +181,9 @@ function TOrdonnancement() {
 		});
     };
     
+    /*
+    create visual task into grid
+    */
     this.addTask = function(task) {
         $li = $('li#task-blank').clone();
 				
@@ -239,23 +250,29 @@ function TOrdonnancement() {
 		});
 		$li.find('div[rel=time-rest]').html(task.aff_time_rest);
 		
+		/*
+		create link to parent task
+		*/
 		$li.mouseenter(function() {
 			$(this).height($(this)[0].scrollHeight);
 			
 			var $sourceDiv =  $(this);
 			var $targetDiv = $("#task-"+$(this).attr('ordo-fktaskparent'));
 			
+			
 			if($sourceDiv.length>0 && $targetDiv.length>0) {
 				if($('#container-svg-'+$(this).attr('id')).length == 0) {
-					$('body').append('<div id="container-svg-'+$(this).attr('id')+'" rel="container-svg" style="position:absolute;top:0;left:0;z-index: -1;opacity: 0.8; width:1px;height:1px;overflow:visible;"><svg stroke-dasharray="10,10" id="svg-'+$(this).attr('id')+'" width="0" height="0"  style="position:absolute;top:0;left:0;"><path id="path-'+$(this).attr('id')+'" d="M0 0" stroke="#000" fill="none" stroke-width="12px";/></div>');
+					$('body').append('<div id="container-svg-'+$(this).attr('id')+'" rel="container-svg" style="position:absolute; top:0;left:0;z-index: 999;opacity: 0.8; width:1px;height:1px;overflow:visible;pointer-events: none; background:none;"><svg stroke-dasharray="10,10" id="svg-'+$(this).attr('id')+'" width="0" height="0"  style="position:absolute;top:0;left:0;"><path id="path-'+$(this).attr('id')+'" d="M0 0" stroke="#000" fill="none" stroke-width="12px"  style="position:absolute;top:0;left:0;" /></div>');
 				}
-			/*	console.log('connectDiv',$sourceDiv,$targetDiv,$('#svg-'+$(this).attr('id')),$('#path-'+$(this).attr('id')));*/
+				/*console.log('connectDiv',$sourceDiv,$targetDiv,$('#svg-'+$(this).attr('id')),$('#path-'+$(this).attr('id')));*/
 				connectElements( $('#svg-'+$(this).attr('id')), $('#path-'+$(this).attr('id')),$sourceDiv, $targetDiv);
+				$targetDiv.trigger('mouseenter');
 			}
 		})
 		.mouseleave(function() {
 			$(this).height($(this).attr('ordo-height'));
-			$('#container-svg-'+$(this).attr('id')).remove();
+			$('div[rel="container-svg"]').animate({opacity:0}, 1000, function() { $(this).remove() });
+
 		});
 		
 		
