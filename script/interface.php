@@ -29,7 +29,7 @@ global $conf;
 			$var = explode('|',GETPOST('status'));
 			$Tab=array();
 			foreach($var as $statut) {
-				$Tab=array_merge($Tab, _tasks($db, (int)GETPOST('id_project'), $statut, $onlyUseGrid));
+				$Tab=array_merge($Tab, _tasks($db, (int)GETPOST('id_project'), $statut, $onlyUseGrid, GETPOST('start') ? GETPOST('start') : null , GETPOST('limit') ? GETPOST('limit') : null ));
 			}
 
 			print json_encode($Tab);
@@ -827,10 +827,10 @@ function _tasks_ordo(&$db,&$TWorkstation, $status, $fk_workstation=0) {
     return $TTask;
 
 }
-function _tasks(&$db, $id_project, $status, $onlyUseGrid = false) {
+function _tasks(&$db, $id_project, $status, $onlyUseGrid = false, $start = null, $limit = null) {
 	global $hookmanager,$conf;
 	$hookmanager->initHooks(array('scrumboardgettasks'));
-
+	
 	$sql = "SELECT t.rowid,t.fk_task_parent, t.grid_col,t.grid_row,ex.fk_workstation,ex.needed_ressource,p.datee as 'project_date_end', t.note_private
 		FROM ".MAIN_DB_PREFIX."projet_task t
 		LEFT JOIN ".MAIN_DB_PREFIX."projet p ON (t.fk_projet=p.rowid)
@@ -881,6 +881,12 @@ function _tasks(&$db, $id_project, $status, $onlyUseGrid = false) {
     if (!empty($sqlorder)) {
     	$sql .=$sqlorder;
     }
+    
+    if(!is_null($limit)) {
+    	
+    	$sql.=' LIMIT '.(int)$start.', '.(int)$limit;
+    	
+    }
 
 	$parameters=array('action'=>'_tasks_before_exec_sql', 'sql'=>&$sql, 'status'=>$status, 'fk_project'=>$id_project, 'onlyUseGrid'=>$onlyUseGrid);
 	$reshook=$hookmanager->executeHooks('doScrumActions',$parameters);
@@ -905,7 +911,10 @@ function _tasks(&$db, $id_project, $status, $onlyUseGrid = false) {
 			 );
 		}
 	}
-
+	else {
+		var_dump($db);
+		exit;
+	}
 
 	return $TTask;
 }

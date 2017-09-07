@@ -1,40 +1,13 @@
 <?php
     require('../config.php');
 ?>
-function TOrdonnancement() {
-    
-    this.TWorkstation = [];
-    
-    var TVelocity = [];
-    var width_column = 200;
-    var height_day = 50;
-    var swap_time = 0.08; /* 5 minute */
-    var nb_hour_per_day = 7;
-    
-    this.init = function(w_column, h_day,sw_time) {
-        /* initialise l'ordo sur la base de TWorkstation */
+/*
+  Get list of orderable task
+ */
        
-       var ordo = this;
+function ordoGetTask(ordo, start) {
+ 	   var limit = 100;
        
-       width_column = w_column;
-       height_day = h_day;
-       swap_time = sw_time;
-       
- 	   $('.fixedHeader').makeFixed({
- 	   	onFixed:function(el) {
- 	   		var initLeft = parseInt( $(el).attr('data-mfx-left') );
- 	   		var leftScroll = parseInt($(document).scrollLeft());
- 	   		var newLeft = initLeft - leftScroll;
- 	   		//console.log(initLeft,leftScroll,newLeft);
- 	   		$(el).css({
- 	   			left : newLeft
- 	   		});
- 	   	}	
- 	   });
-
-       /*
-       Get list of orderable task
-       */
        $.ajax({
 			url : "./script/interface.php"
 			,data: {
@@ -44,10 +17,21 @@ function TOrdonnancement() {
 				,gridMode : 1 
 				,id_project : 0
 				,async:false
+				,start:start
+				,limit:limit
 			}
 			,dataType: 'json'
 		})
 		.done(function (tasks) {
+			
+			if(tasks.length>0) {
+				ordoGetTask(ordo, start + limit);
+			}
+			else {
+				ordo.Order();
+				
+				return false;
+			}
 			
 			$.each(tasks, function(i, task) {
 			
@@ -148,8 +132,44 @@ function TOrdonnancement() {
 				}
 			});
 			
-			order();
+			
 		}); 
+
+} 
+
+function TOrdonnancement() {
+    
+    this.TWorkstation = [];
+    
+    var TVelocity = [];
+    var width_column = 200;
+    var height_day = 50;
+    var swap_time = 0.08; /* 5 minute */
+    var nb_hour_per_day = 7;
+    
+    this.init = function(w_column, h_day,sw_time) {
+        /* initialise l'ordo sur la base de TWorkstation */
+       
+       var ordo = this;
+       
+       width_column = w_column;
+       height_day = h_day;
+       swap_time = sw_time;
+       
+ 	   $('.fixedHeader').makeFixed({
+ 	   	onFixed:function(el) {
+ 	   		var initLeft = parseInt( $(el).attr('data-mfx-left') );
+ 	   		var leftScroll = parseInt($(document).scrollLeft());
+ 	   		var newLeft = initLeft - leftScroll;
+ 	   		//console.log(initLeft,leftScroll,newLeft);
+ 	   		$(el).css({
+ 	   			left : newLeft
+ 	   		});
+ 	   	}	
+ 	   });
+
+      
+       ordoGetTask(ordo, 0);
        
     };
     
@@ -441,7 +461,7 @@ function TOrdonnancement() {
            });
            
             	
-           $("div.loading-ordo").hide('slide', {direction: 'left'}, 500);
+           $("div.loading-ordo").hide();
 
 		}); 
     	
