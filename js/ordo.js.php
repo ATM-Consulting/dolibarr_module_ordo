@@ -583,7 +583,7 @@ function TOrdonnancement() {
 				if(empty($conf->global->SCRUM_HIDE_PROJECT_LIST_ON_THE_RIGHT)) { 
 			?>
 			
-				$('#list-projects').append('<li fk-project="'+idProject+'" id="project-'+idProject+'" class="project start" style="text-align:left; position:relative; padding:10px; top:'+(project.start - 20)+'px;float:left; height:'+(project.end - project.start)+'px; width:15px;border-radius: 0; margin-right:5px;" onclick="ToggleProject('+idProject+')"><span style="transform: rotate(90deg);transform-origin: left top 0;display:block; white-space:nowrap; margin-left:15px;"><a href="<?php echo dol_buildpath('/projet/'.((float)DOL_VERSION > 3.6 ? 'card.php' : 'fiche.php'),1) ?>?id='+idProject+'">'+project.name+'</a> '+project.progress+'%</span></li>');
+				$('#list-projects').append('<li fk-project="'+idProject+'" id="project-'+idProject+'" class="project start" style="text-align:left; position:absolute; padding:10px; left:0; top:'+(project.start - 20)+'px;float:none; height:'+(project.end - project.start)+'px; width:15px;border-radius: 0; margin-right:5px;" onclick="ToggleProject('+idProject+')"><span style="transform: rotate(90deg);transform-origin: left top 0;display:block; white-space:nowrap; margin-left:15px;"><a href="<?php echo dol_buildpath('/projet/'.((float)DOL_VERSION > 3.6 ? 'card.php' : 'fiche.php'),1) ?>?id='+idProject+'">'+project.name+'</a> '+project.progress+'%</span></li>');
 			
 			<?php 
 				} 
@@ -613,6 +613,14 @@ function TOrdonnancement() {
 
 		}
 		
+		$('#list-projects > li[fk-project]').each(function(i,item1) {
+			var $item1 = $(item1);
+			
+			_checkProjectHover($item1);
+			
+		});
+		
+		
 		wtable=0;
 		$("#theGrid>div").each(function() {
 		    wtable+=parseInt($(this).css('width'))+5;
@@ -624,6 +632,44 @@ function TOrdonnancement() {
     };
     
 };
+
+function _checkProjectHover($item1) {
+	
+	var fk_project1 = $item1.attr('fk-project');
+			
+	var item1Top = $item1.position().top,
+				item1Left = $item1.position().left,
+				item1Width = $item1.width(),
+				item1Height = $item1.height();        
+	
+	$('#list-projects > li[fk-project]').each(function(i,item2) {
+		var $item2 = $(item2);
+		var fk_project2 = $item2.attr('fk-project');
+	
+		if(fk_project1 != fk_project2) {
+					
+				var item2Top = $item2.position().top,
+					item2Left = $item2.position().left,
+					item2Width = $item2.width(),
+					item2Height = $item2.height();         	
+					
+				if((item1Left + item1Width) > item2Left && item1Left < (item2Left + item2Width) && (item1Top + item1Height) > item2Top && item1Top < (item2Top + item2Height)){
+
+					$item1.css({
+						'left':(item1Left+40)+'px'
+					});
+					
+			        _checkProjectHover($item1);
+			        
+			        return true;
+			    }	
+					
+		}
+	});
+	
+	return false;
+
+}
 
 TWorkstation = function() {
     
