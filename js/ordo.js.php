@@ -616,7 +616,9 @@ function TOrdonnancement() {
 		$('#list-projects > li[fk-project]').each(function(i,item1) {
 			var $item1 = $(item1);
 			
-			_checkProjectHover($item1);
+			window.setTimeout(function() {
+				_checkProjectHover($item1,0);
+			},100 * i);
 			
 		});
 		
@@ -633,8 +635,11 @@ function TOrdonnancement() {
     
 };
 
-function _checkProjectHover($item1) {
-	
+function _checkProjectHover($item1, itt) {
+//return false;
+	itt++;
+	if(itt>50)return false;
+
 	var fk_project1 = $item1.attr('fk-project');
 			
 	var item1Top = $item1.position().top,
@@ -653,15 +658,18 @@ function _checkProjectHover($item1) {
 					item2Width = $item2.width(),
 					item2Height = $item2.height();         	
 					
-				if((item1Left + item1Width) > item2Left && item1Left < (item2Left + item2Width) && (item1Top + item1Height) > item2Top && item1Top < (item2Top + item2Height)){
+			   if(
+				 (item1Top + item1Height) > item2Top && item1Top < (item2Top + item2Height)
+					&&(item1Left + item1Width) > item2Left && item1Left < (item2Left + item2Width) 
+			   ){
 
 					$item1.css({
 						'left':(item1Left+40)+'px'
 					});
 					
-			        _checkProjectHover($item1);
+			        _checkProjectHover($item1, itt);
 			        
-			        return true;
+			        return false;
 			    }	
 					
 		}
