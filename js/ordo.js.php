@@ -122,7 +122,7 @@ function ordoGetTask(ordo, start) {
 						
 						for(x in TWSid) {
 							wsid = TWSid[x];
-							sortTask(wsid);
+							ordo._sortTask(wsid);
 						}
 					});
 						
@@ -172,6 +172,10 @@ function TOrdonnancement() {
        ordoGetTask(ordo, 0);
        
     };
+    
+    this._sortTask = function(wsid,notReOrderAfter) {
+    	sortTask(wsid,notReOrderAfter);
+    }
     
     /*
     put sort to db
