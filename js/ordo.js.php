@@ -25,113 +25,116 @@ function ordoGetTask(ordo, start) {
 		.done(function (tasks) {
 			
 			if(tasks.length>0) {
+			
+				$.each(tasks, function(i, task) {
+				
+					ordo.addTask(task);
+					
+	            });
+				
 				ordoGetTask(ordo, start + limit);
 			}
 			else {
+			
+			
+				$('*.classfortooltip').tipTip({maxWidth: "600px", edgeOffset: 10, delay: 50, fadeIn: 50, fadeOut: 50});
+				
+				/* 
+				set task dragabble for workstation to other or in time
+				*/ 
+				$('.connectedSortable>li').unbind().draggable({ 
+					snap: true
+					,containment: "table#scrum td#tasks table"
+					,handle: "header"
+					,helper: "original"
+					,snapTolerance: 30
+					, distance: 10
+					,drag:function(event, ui) {
+						
+						$(this).css({
+							'box-shadow': '1px 5px 5px #000'
+							,transform: 'rotate(7deg) '
+							
+						});
+					}
+					,stop:function(event, ui) {
+						/*sortTask($(this).attr('ordo-ws-id'));*/
+						
+						$(this).css({
+							'box-shadow': 'none'
+							,transform:'none'
+	
+						});
+					}
+				 });
+				
+				$('ul.droppable').unbind().droppable({
+					drop:function(event,ui) {
+						
+						item = ui.draggable;
+						
+						taskid = $(item).attr('task-id');
+						wsid = $(this).attr('ws-id');
+						old_wsid = $(item).attr('ordo-ws-id');
+						
+						if($(this).attr('ws-nb-ressource')< $(item).attr('ordo-needed-ressource')) {
+							alert("Il n'y a pas assez de ressource sur ce poste pour poser cette tâche.");
+							
+							return false;
+						}
+						
+						/*$(item).find('header').css('background', 'lightblue');*/
+						$(item).addClass('loading');
+						
+						$(item).attr('ordo-ws-id', $(this).attr('ws-id'));
+						$(item).appendTo($(this));
+						$(item).css('left',0);
+						
+						$.ajax({
+							url : "./script/interface.php"
+							,data: {
+								json:1
+								,put : 'ws'
+								,taskid:taskid
+								,fk_workstation:$(this).attr('ws-id')
+								
+							}
+							,dataType: 'json'
+						}).done(function(data) {
+							
+							var TWSid = [wsid];
+							if(TWSid.indexOf(old_wsid)) TWSid.push(old_wsid);
+							
+							var init_top = parseInt($("li#task-"+taskid).css('top'));
+							for(x in data) {
+							
+								taskid_l = data[x];
+								
+								wsid_l = $("li#task-"+taskid_l).attr("ordo-ws-id");
+								if(TWSid.indexOf(wsid_l)) TWSid.push(wsid_l);
+								
+								init_top++;
+								$("li#task-"+taskid_l).appendTo("ul#list-task-"+wsid).attr("ordo-ws-id",wsid).css('top',init_top);
+								
+							}
+							
+							for(x in TWSid) {
+								wsid = TWSid[x];
+								ordo._sortTask(wsid);
+							}
+						});
+							
+						
+						
+						
+					}
+				});
+				
+			
 				ordo.Order();
 				
 				return false;
 			}
-			
-			$.each(tasks, function(i, task) {
-			
-				ordo.addTask(task);
-				
-            });
-
-			$('*.classfortooltip').tipTip({maxWidth: "600px", edgeOffset: 10, delay: 50, fadeIn: 50, fadeOut: 50});
-			
-			/* 
-			set task dragabble for workstation to other or in time
-			*/ 
-			$('.connectedSortable>li').draggable({ 
-				snap: true
-				,containment: "table#scrum td#tasks table"
-				,handle: "header"
-				,helper: "original"
-				,snapTolerance: 30
-				, distance: 10
-				,drag:function(event, ui) {
-					
-					$(this).css({
-						'box-shadow': '1px 5px 5px #000'
-						,transform: 'rotate(7deg) '
-						
-					});
-				}
-				,stop:function(event, ui) {
-					/*sortTask($(this).attr('ordo-ws-id'));*/
-					
-					$(this).css({
-						'box-shadow': 'none'
-						,transform:'none'
-
-					});
-				}
-			 });
-			
-			$('ul.droppable').droppable({
-				drop:function(event,ui) {
-					
-					item = ui.draggable;
-					
-					taskid = $(item).attr('task-id');
-					wsid = $(this).attr('ws-id');
-					old_wsid = $(item).attr('ordo-ws-id');
-					
-					if($(this).attr('ws-nb-ressource')< $(item).attr('ordo-needed-ressource')) {
-						alert("Il n'y a pas assez de ressource sur ce poste pour poser cette tâche.");
-						
-						return false;
-					}
-					
-					/*$(item).find('header').css('background', 'lightblue');*/
-					$(item).addClass('loading');
-					
-					$(item).attr('ordo-ws-id', $(this).attr('ws-id'));
-					$(item).appendTo($(this));
-					$(item).css('left',0);
-					
-					$.ajax({
-						url : "./script/interface.php"
-						,data: {
-							json:1
-							,put : 'ws'
-							,taskid:taskid
-							,fk_workstation:$(this).attr('ws-id')
-							
-						}
-						,dataType: 'json'
-					}).done(function(data) {
-						
-						var TWSid = [wsid];
-						if(TWSid.indexOf(old_wsid)) TWSid.push(old_wsid);
-						
-						var init_top = parseInt($("li#task-"+taskid).css('top'));
-						for(x in data) {
-						
-							taskid_l = data[x];
-							
-							wsid_l = $("li#task-"+taskid_l).attr("ordo-ws-id");
-							if(TWSid.indexOf(wsid_l)) TWSid.push(wsid_l);
-							
-							init_top++;
-							$("li#task-"+taskid_l).appendTo("ul#list-task-"+wsid).attr("ordo-ws-id",wsid).css('top',init_top);
-							
-						}
-						
-						for(x in TWSid) {
-							wsid = TWSid[x];
-							ordo._sortTask(wsid);
-						}
-					});
-						
-					
-					
-					
-				}
-			});
-			
 			
 		}); 
 

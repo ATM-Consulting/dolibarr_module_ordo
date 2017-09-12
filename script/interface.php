@@ -32,7 +32,9 @@ global $conf;
 				$Tab=array_merge($Tab, _tasks($db, (int)GETPOST('id_project'), $statut, $onlyUseGrid, GETPOST('start') ? GETPOST('start') : null , GETPOST('limit') ? GETPOST('limit') : null ));
 			}
 
-			print json_encode($Tab);
+			header("Content-type: text/javascript");
+			header('Content-Encoding: gzip'); 
+			print gzencode(json_encode($Tab),9);
 
 			break;
 		case 'task-ordo-simulation':
@@ -100,8 +102,9 @@ global $conf;
 
             }
 
-            print json_encode($Tab);
-
+            header("Content-type: text/javascript");
+            header('Content-Encoding: gzip');
+            print gzencode(json_encode($Tab),9);
 
             break;
 
