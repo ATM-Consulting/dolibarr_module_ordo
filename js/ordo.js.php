@@ -281,18 +281,21 @@ function TOrdonnancement() {
 		create link to parent task
 		*/
 		$li.mouseenter(function() {
-			$(this).height($(this)[0].scrollHeight);
+			$this = $(this);
+			var idLi =$this.attr('id'); 
+		
+			$this.height($(this)[0].scrollHeight);
 			
-			var $sourceDiv =  $(this);
-			var $targetDiv = $("#task-"+$(this).attr('ordo-fktaskparent'));
+			var $sourceDiv =  $this;
+			var $targetDiv = $("#task-"+$this.attr('ordo-fktaskparent'));
 			
 			
 			if($sourceDiv.length>0 && $targetDiv.length>0) {
-				if($('#container-svg-'+$(this).attr('id')).length == 0) {
-					$('body').append('<div id="container-svg-'+$(this).attr('id')+'" rel="container-svg" style="position:absolute; top:0;left:0;z-index: 999;opacity: 0.8; width:1px;height:1px;overflow:visible;pointer-events: none; background:none;"><svg stroke-dasharray="10,10" id="svg-'+$(this).attr('id')+'" width="0" height="0"  style="position:absolute;top:0;left:0;"><path id="path-'+$(this).attr('id')+'" d="M0 0" stroke="#000" fill="none" stroke-width="12px"  style="position:absolute;top:0;left:0;" /></div>');
+				if($('#container-svg-'+idLi).length == 0) {
+					$('body').append('<div id="container-svg-'+idLi+'" rel="container-svg" style="position:absolute; top:0;left:0;z-index: 999;opacity: 0.8; width:1px;height:1px;overflow:visible;pointer-events: none; background:none;"><svg stroke-dasharray="10,10" id="svg-'+idLi+'" width="0" height="0"  style="position:absolute;top:0;left:0;"><path id="path-'+idLi+'" d="M0 0" stroke="#000" fill="none" stroke-width="12px"  style="position:absolute;top:0;left:0;" /></div>');
 				}
-				/*console.log('connectDiv',$sourceDiv,$targetDiv,$('#svg-'+$(this).attr('id')),$('#path-'+$(this).attr('id')));*/
-				connectElements( $('#svg-'+$(this).attr('id')), $('#path-'+$(this).attr('id')),$sourceDiv, $targetDiv);
+			
+				connectElements( $('#svg-'+idLi), $('#path-'+idLi),$sourceDiv, $targetDiv);
 				$targetDiv.trigger('mouseenter');
 			}
 		})
@@ -301,7 +304,6 @@ function TOrdonnancement() {
 			$('div[rel="container-svg"]').animate({opacity:0}, 1000, function() { $(this).remove() });
 
 		});
-		
 		
 		$li.attr('id', 'task-'+task.id);
 		$li.addClass('draggable');
@@ -454,7 +456,7 @@ function TOrdonnancement() {
                     }
                     ,{	
                     	complete : function() {
-                    		if(i+1 == nb_tasks || i == 0) {
+                    		if(i+1 == nb_tasks ) {
                     			afterAnimationOrder();
                     		}
                     	}
@@ -598,57 +600,56 @@ function TOrdonnancement() {
 			
 		}
 
-		$('#list-projects li').remove();
-		/*$('#list-projects').css("width", TProject.length * 40);
-		$('td.projects').css("width", TProject.length * 40);
-		*/
-		for(idProject in TProject) {
-
-			project = TProject[idProject];
-			
-			<?php 
-				if(empty($conf->global->SCRUM_HIDE_PROJECT_LIST_ON_THE_RIGHT)) { 
-			?>
-			
-				$('#list-projects').append('<li fk-project="'+idProject+'" id="project-'+idProject+'" class="project start" style="text-align:left; position:absolute; padding:10px; left:0; top:'+(project.start - 20)+'px;float:none; height:'+(project.end - project.start)+'px; width:15px;border-radius: 0; margin-right:5px;" onclick="ToggleProject('+idProject+')"><span style="transform: rotate(90deg);transform-origin: left top 0;display:block; white-space:nowrap; margin-left:15px;"><a href="<?php echo dol_buildpath('/projet/'.((float)DOL_VERSION > 3.6 ? 'card.php' : 'fiche.php'),1) ?>?id='+idProject+'">'+project.name+'</a> '+project.progress+'%</span></li>');
-			
-			<?php 
-				} 
-			?>	
-			
-			
-			if(project.hasLateTask) {
-				$('#list-projects li[fk-project='+idProject+']').addClass('projectLate').css('background','');
-			}
-			else if(project.hasMaybeLateTask) {
-				$('#list-projects li[fk-project='+idProject+']').addClass('projectMaybeLate').css('background','');
-			}
-			else if(project.planned_workload < project.duration_effective){
-				 $('#list-projects li[fk-project='+idProject+']').addClass('projectMaybeLate').css('background','');
-			}
-			else {
-				if(project.color!=null && project.color!='') {
-					$('#list-projects li[fk-project='+idProject+']').css('background', project.color);
+		if($('#list-projects li[fk-project]').length == 0) {
+		
+			for(idProject in TProject) {
+	
+				project = TProject[idProject];
+				
+				<?php 
+					if(empty($conf->global->SCRUM_HIDE_PROJECT_LIST_ON_THE_RIGHT)) { 
+				?>
+				
+					$('#list-projects').append('<li fk-project="'+idProject+'" id="project-'+idProject+'" class="project start" style="text-align:left; position:absolute; padding:10px; left:0; top:'+(project.start - 20)+'px;float:none; height:'+(project.end - project.start)+'px; width:15px;border-radius: 0; margin-right:5px;" onclick="ToggleProject('+idProject+')"><span style="transform: rotate(90deg);transform-origin: left top 0;display:block; white-space:nowrap; margin-left:15px;"><a href="<?php echo dol_buildpath('/projet/'.((float)DOL_VERSION > 3.6 ? 'card.php' : 'fiche.php'),1) ?>?id='+idProject+'">'+project.name+'</a> '+project.progress+'%</span></li>');
+				
+				<?php 
+					} 
+				?>	
+				
+				
+				if(project.hasLateTask) {
+					$('#list-projects li[fk-project='+idProject+']').addClass('projectLate').css('background','');
+				}
+				else if(project.hasMaybeLateTask) {
+					$('#list-projects li[fk-project='+idProject+']').addClass('projectMaybeLate').css('background','');
+				}
+				else if(project.planned_workload < project.duration_effective){
+					 $('#list-projects li[fk-project='+idProject+']').addClass('projectMaybeLate').css('background','');
+				}
+				else {
+					if(project.color!=null && project.color!='') {
+						$('#list-projects li[fk-project='+idProject+']').css('background', project.color);
+						
+					}
+					else{
+						$('#list-projects li[fk-project='+idProject+']').css('background', '#ccc');
+						
+					}		
 					
 				}
-				else{
-					$('#list-projects li[fk-project='+idProject+']').css('background', '#ccc');
-					
-				}		
-				
+	
 			}
-
+			
+			$('#list-projects > li[fk-project]').each(function(i,item1) {
+				var $item1 = $(item1);
+				
+				window.setTimeout(function() {
+					_checkProjectHover($item1,0);
+				},100 * i);
+				
+			});
+			
 		}
-		
-		$('#list-projects > li[fk-project]').each(function(i,item1) {
-			var $item1 = $(item1);
-			
-			window.setTimeout(function() {
-				_checkProjectHover($item1,0);
-			},100 * i);
-			
-		});
-		
 		
 		wtable=0;
 		$("#theGrid>div").each(function() {
