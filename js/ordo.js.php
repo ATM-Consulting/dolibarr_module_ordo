@@ -12,7 +12,7 @@ var TProject=[];
     	       
        
 function ordoGetTask(ordo, start) {
- 	   var limit = 1;
+ 	   var limit = 500;
        
        $.ajax({
 			url : "./script/interface.php"
@@ -777,7 +777,7 @@ function renderVisibleTask() {
 		}
 		else{
 			$('li#task-'+task.id).remove();
-			console.log('remove',task.id);
+		
 		}
 	
 	}
