@@ -290,11 +290,7 @@ function _draw_grid(&$TWorkstation, $column_width) {
 		</div>
 		
 		<div style="display:none">
-			
-			<ul>
-			<li id="task-blank">
-				<header>|||</header>
-				<div rel="content">
+			<!-- 				<div rel="content">
     				<span rel="project" style="display:none;"></span> <span rel="task-link">[<a href="#" rel="ref"> </a>] <span rel="label" class="classfortooltip" title="">label</span></span>
     				<div rel="divers"></div>
                     <div rel="time-projection" <?php echo empty($conf->global->SCRUM_SHOW_SHOW_ESTIMATED_START_END) ? 'style="display:none"': ''; ?>></div>
@@ -302,7 +298,11 @@ function _draw_grid(&$TWorkstation, $column_width) {
                     <div rel="users"></div>
     				<div rel="time-end"></div>
     				<a href="javascript:;" class="button split" title="<?php echo $langs->trans('SplitTask'); ?>">x</a>
-				</div> 
+				</div> --> 
+			<ul>
+			<li id="task-blank">
+				<header>|||</header>
+
 				<div class="loading"></div>
 			</li>
 			</ul>
