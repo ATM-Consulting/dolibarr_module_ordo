@@ -748,9 +748,16 @@ $( window ).scroll(function() {
 	renderVisibleTask();
 });
 
+var previousTop = -1;
 function renderVisibleTask() {
+
 	var gridPos = $('#theGrid').offset();
 	var docViewTop = $(window).scrollTop() - gridPos.top;
+	
+	if(Math.abs(previousTop - docViewTop)<20) return false;
+	
+	previousTop = docViewTop;
+	
     var docViewBottom = docViewTop + $(window).height();
     var coef_time = height_day / nb_hour_per_day;
 
@@ -775,9 +782,10 @@ function renderVisibleTask() {
 		if(task_top < docViewBottom + 200 && task_bottom > docViewTop - 200) {
 			drawTask(task.id);
 		}
-		else{
-			$('li#task-'+task.id).remove();
-		
+		else if(task.in_view) {
+				$('li#task-'+task.id).remove();
+				task.in_view = false;
+				
 		}
 	
 	}
@@ -790,6 +798,8 @@ function drawTask(idTask) {
 //console.log(task);
 		task = TTaskCache[idTask];
 		
+		task.in_view = true;
+		
 		var coef_time = height_day / nb_hour_per_day;
 		
 		var animation = false;
@@ -800,8 +810,7 @@ function drawTask(idTask) {
 		var height = 1;
 		
 		if($li.length == 0) {
-			console.log('create',task.id);
-		
+			
 			$li = $('li#task-blank').clone();
 			$li.attr('task-id', task.id);
 			$li.attr('id', 'task-'+task.id);
