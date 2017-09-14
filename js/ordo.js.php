@@ -754,7 +754,10 @@ function renderVisibleTask() {
 	var gridPos = $('#theGrid').offset();
 	var docViewTop = $(window).scrollTop() - gridPos.top;
 	
-	if(Math.abs(previousTop - docViewTop)<20) return false;
+	if(Math.abs(previousTop - docViewTop)<200) {
+	/*	console.log('previousTop',previousTop,previousTop - docViewTop);*/
+		return false;
+	}
 	
 	previousTop = docViewTop;
 	
@@ -779,7 +782,7 @@ function renderVisibleTask() {
 		task_top = coef_time * task.grid_row;
 		task_bottom = task_top+(height * coef_time);
 		
-		if(task_top < docViewBottom + 200 && task_bottom > docViewTop - 200) {
+		if(task_top < docViewBottom + 500 && task_bottom > docViewTop - 500) {
 			drawTask(task.id);
 		}
 		else if(task.in_view) {
