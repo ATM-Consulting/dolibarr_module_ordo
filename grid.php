@@ -65,7 +65,7 @@
     $tile_mode = !isset($_SESSION['tile_mode']) ? 1 : $_SESSION['tile_mode'];
 	$day_height =  $hour_height * 7;
 
-	llxHeader('', $langs->trans('GridTasks') , '','',0,0, array('/ordo/js/scrum.js.php'));
+	llxHeader('', $langs->trans('GridTasks') , '','',0,0, array('/ordo/js/scrum.js.php','/ordo/lib/konva/konva.min.js'));
 
 	$form = new Form($db);
 
@@ -259,10 +259,10 @@ function _draw_grid(&$TWorkstation, $column_width) {
 		        		<a href="javascript:toggleWorkStation(<?php echo $w_id; ?>)" ws-id="<?php echo $w_id; ?>"><?php echo $w_param['name'].($w_param['velocity'] != 1 ? ' '.round($w_param['velocity']*100).'%' : ''); ?></a>
 		        	</span>
 		        </div>
-				<ul style="position:relative;min-height: 500px;min-width:<?php echo round($w_column); ?>z-index:10;" id="list-task-<?php echo $w_id; ?>" ws-id="<?php echo $w_id; ?>" class="task-list droppable connectedSortable needToResize" rel="all-task" ws-nb-ressource="<?php echo $w_param['nb_ressource']; ?>">
+				<ul style="position:relative;min-height: 500px;min-width:<?php echo round($w_column); ?>;z-index:10;" id="list-task-<?php echo $w_id; ?>" ws-id="<?php echo $w_id; ?>" class="task-list droppable connectedSortable needToResize" rel="all-task" ws-nb-ressource="<?php echo $w_param['nb_ressource']; ?>">
 						
 				</ul>
-
+				
 		</div><?php 
 		
 	}
