@@ -45,12 +45,12 @@ function ordoGetTask(ordo, start) {
 			else {
 
 
-				$('*.classfortooltip').tipTip({maxWidth: "600px", edgeOffset: 10, delay: 50, fadeIn: 50, fadeOut: 50});
+			//	$('*.classfortooltip').tipTip({maxWidth: "600px", edgeOffset: 10, delay: 50, fadeIn: 50, fadeOut: 50});
 
 				/*
 				set task dragabble for workstation to other or in time
 				*/
-
+/*
 				$('ul.droppable').unbind().droppable({
 					drop:function(event,ui) {
 
@@ -66,7 +66,6 @@ function ordoGetTask(ordo, start) {
 							return false;
 						}
 
-						/*$(item).find('header').css('background', 'lightblue');*/
 						$(item).addClass('loading');
 
 						$(item).attr('ordo-ws-id', $(this).attr('ws-id'));
@@ -113,7 +112,7 @@ function ordoGetTask(ordo, start) {
 					}
 				});
 
-
+*/
 				ordo.Order();
 
 				return false;
@@ -210,6 +209,7 @@ function TOrdonnancement() {
 
     this.Order = function(wsid, nb_ressource) {
     	order(wsid, nb_ressource);
+
     }
 
     var order = function(wsid, nb_ressource) {
@@ -778,22 +778,53 @@ function drawTask(idTask) {
 					task_height = Math.round( duration * (1- (task.progress / 100)) /TVelocity[task.fk_workstation]*coef_time  );
 				}
 			}
+			task_height = parseInt(task_height);
+			var fk_workstation = parseInt(task.fk_workstation);
 
-			task_left=(width_column * taskordo.grid_col);
+			task_left=(width_column * taskordo.grid_col) + CanvaWorkstation[fk_workstation].x;
 			task_width = (width_column*taskordo.needed_ressource)-2;
 
-			var rect = new Konva.Rect({
-		      x: task_left,
-		      y: task_top,
-		      width: 100,
+			var layer = canvasGrid.find('#Layer'+fk_workstation)[0];
+
+		    var group = new Konva.Group({
+		        x: parseInt(task_left),
+		        y: parseInt(task_top),
+		        clipX:0,
+		        clipY:0,
+		        clipWidth:width_column,
+		        clipHeight:task_height,
+		        draggable: true
+		    });
+
+			group.add(new Konva.Rect({
+		      x: 0,
+		      y: 0,
+		      width: width_column,
 		      height: task_height,
 		      fill: 'green',
 		      stroke: 'black',
-		      strokeWidth: 4
+		      strokeWidth: 1,
+		      cornerRadius:0,
+		      id:'Task'+idTask
+		    }));
+
+		    group.add( new Konva.Text({
+				x:10
+				,y:10
+				,text:"["+task.ref+"] "+task.label
+
+		    }));
+
+	        group.on('mouseover', function() {
+		        document.body.style.cursor = 'pointer';
+		    });
+		    group.on('mouseout', function() {
+		        document.body.style.cursor = 'default';
 		    });
 
-		    canvasGrid.find('#Layer'+task.fk_workstation).add(rect);
+			layer.add(group).draw();
 
+		    /*canvasGrid.add(layer);*/
 
 		}
 		/*task.in_view = true;

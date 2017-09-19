@@ -59,7 +59,7 @@
 
 	$column_width = 200;//pour test
 
-	llxHeader('', $langs->trans('GridTasks') , '','',0,0, array('/ordo/js/canvas.js.php','/ordo/lib/konva/konva.min.js'));
+	llxHeader('', $langs->trans('GridTasks') , '','',0,0, array('/ordo/lib/konva/konva.min.js'));
 
 	$form = new Form($db);
 
@@ -74,6 +74,9 @@
 									  width: <?php echo round($number_of_columns * $column_width) ?>,
 									  height: 5000
 								});
+
+								var CanvaWorkstation={};
+
 						</script>
 
 						<?php
@@ -95,7 +98,7 @@
 
 <?php
 
- //_js_grid($TWorkstation, $day_height, $column_width);
+ _js_grid($TWorkstation, $day_height, $column_width);
 function _order_by_name(&$a, &$b) {
 
     $r = strcmp($a['name'],$b['name']);
@@ -127,8 +130,41 @@ function _js_grid(&$TWorkstation, $day_height, $column_width) {
 		            var w_column = <?php echo $column_width; ?>;
 		            var h_day = <?php echo $day_height; ?>;
 		            var TDayOff = new Array( <?php echo $conf->global->TIMESHEET_DAYOFF; ?> );
+
+					var dragLayer =  new Konva.Layer({
+
+					});
+					canvasGrid.add(dragLayer);
+
+					var TaskLayer;
+/*
+		            canvasGrid.on('mousedown', function(evt) {
+			            console.log(evt);
+			            var currentTask = evt.target;
+		                TaskLayer = currentTask.getLayer();
+
+		                positionPointer = canvasGrid.getPointerPosition();
+
+		                var positionTask = currentTask.position();
+
+						currentTask.moveTo(dragLayer);
+
+		                TaskLayer.draw();
+		                currentTask.startDrag();
+		            });
+
+		            canvasGrid.on('mouseup', function(evt) {
+			            console.log('mouseup');
+		                var currentTask = evt.target;
+		                var layer = currentTask.getLayer();
+		                currentTask.moveTo(TaskLayer);
+		                dragLayer.draw();
+		                TaskLayer.draw();
+		                currentTask.stopDrag();
+		            });
+*/
 		        </script>
-		        <script type="text/javascript" src="./js/ordo.js.php"></script>
+		        <script type="text/javascript" src="./js/canvas.js.php"></script>
 	            <script type="text/javascript" src="./js/makefixed.js"></script>
 	            <script type="text/javascript" src="./js/svg.js"></script>
 
@@ -205,23 +241,26 @@ function _draw_grid(&$TWorkstation, $column_width) {
 
 		?>	<script type="text/javascript">
 
-					var layer = new Konva.Layer({
-						offsetX:<?php echo $offsetX; ?>
+					CanvaWorkstation[<?php echo $w_id; ?>] = {};
+					CanvaWorkstation[<?php echo $w_id; ?>].x = <?php echo $offsetX; ?>;
+
+					var layer<?php echo $w_id; ?> = new Konva.Layer({
+						x:0
+						,y:0
 						,height:5000
 						,width:<?php echo $w_column?>
-						,clearBeforeDraw:false
+						,clearBeforeDraw:true
 						,id:'Layer<?php echo $w_id; ?>'
 					});
 
-					layer.add( new Konva.Line({
-						  x: <?php echo $w_column?>,
-						  y: 0,
-						  points: [<?php echo $w_column?>,5000],
-						  stroke: 'red',
-						  tension: 1
-					}) );
+					layer<?php echo $w_id; ?>.add( new Konva.Line({
+					      points: [<?php echo $width_table?>, 0, <?php echo $width_table?>, canvasGrid.height()],
+					      stroke: '#999',
+					      strokeWidth: 1,
+					      dash: [5, 10]
+					    }) );
 
-					canvasGrid.add(layer);
+					canvasGrid.add(layer<?php echo $w_id; ?>);
 
 				</script>
 		<?php
