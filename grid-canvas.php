@@ -134,35 +134,77 @@ function _js_grid(&$TWorkstation, $day_height, $column_width) {
 					var dragLayer =  new Konva.Layer({
 
 					});
+
+					var Layer =  new Konva.Layer({
+
+					});
 					canvasGrid.add(dragLayer);
 
 					var TaskLayer;
-/*
-		            canvasGrid.on('mousedown', function(evt) {
-			            console.log(evt);
-			            var currentTask = evt.target;
-		                TaskLayer = currentTask.getLayer();
 
-		                positionPointer = canvasGrid.getPointerPosition();
+					canvasGrid.on("dragstart", function(e){
+						obj = e.target;
+						TaskLayer = obj.getLayer();
 
-		                var positionTask = currentTask.position();
+						var tile = obj.find('Rect')[0];
+						tile.shadowBlur(20);
+						tile.shadowColor('yellow');
+						tile.shadowEnabled(true);
+						tile.shadowOffset({x : 10, y : 10});
 
-						currentTask.moveTo(dragLayer);
+				        obj.moveTo(dragLayer);
+				        TaskLayer.draw(TaskLayer);
+				        dragLayer.draw(TaskLayer);
+				    });
 
-		                TaskLayer.draw();
-		                currentTask.startDrag();
-		            });
-
-		            canvasGrid.on('mouseup', function(evt) {
-			            console.log('mouseup');
-		                var currentTask = evt.target;
-		                var layer = currentTask.getLayer();
-		                currentTask.moveTo(TaskLayer);
+					canvasGrid.on("dragend", function(e){
+						obj = e.target;
+						obj.moveTo(TaskLayer);
 		                dragLayer.draw();
 		                TaskLayer.draw();
-		                currentTask.stopDrag();
-		            });
-*/
+
+						var x = e.evt.layerX;
+						var y = e.evt.layerX;
+
+						var fk_workstation = 0;
+						for(wsid in CanvaWorkstation) {
+
+							if(x>= CanvaWorkstation[wsid].x && x<CanvaWorkstation[wsid].width+CanvaWorkstation[wsid].x) {
+								fk_workstation = wsid;
+							}
+
+						}
+						/*console.log('dragend',fk_workstation, e);*/
+						var taskid = obj.attrs.idTask;
+						var old_wsid = obj.attrs.fk_workstation;
+
+						var top = parseInt(y / (height_day / nb_hour_per_day));
+
+						$.ajax({
+							url : "./script/interface.php"
+							,data: {
+								json:1
+								,put : 'ws'
+								,taskid:taskid
+								,fk_workstation:fk_workstation
+								,top:top
+							}
+							,dataType: 'json'
+						}).done(function(data) {
+
+							var TWSid = [wsid];
+							if(TWSid.indexOf(old_wsid)) TWSid.push(old_wsid);
+
+							for(x in TWSid) {
+								wsid = TWSid[x];
+								document.ordo.order(wsid);
+							}
+
+						});
+
+
+					});
+
 		        </script>
 		        <script type="text/javascript" src="./js/canvas.js.php"></script>
 	            <script type="text/javascript" src="./js/makefixed.js"></script>
@@ -187,6 +229,7 @@ function _js_grid(&$TWorkstation, $day_height, $column_width) {
 				}
 				$(document).ready(function(){
   					$('#ws-list-top').width($( window ).width());
+					$('#theGrid').width( $('div.konvajs-content').width() );
 
 				     document.ordo = new TOrdonnancement();
 
@@ -243,14 +286,10 @@ function _draw_grid(&$TWorkstation, $column_width) {
 
 					CanvaWorkstation[<?php echo $w_id; ?>] = {};
 					CanvaWorkstation[<?php echo $w_id; ?>].x = <?php echo $offsetX; ?>;
+					CanvaWorkstation[<?php echo $w_id; ?>].width = <?php echo $w_column; ?>;
 
 					var layer<?php echo $w_id; ?> = new Konva.Layer({
-						x:0
-						,y:0
-						,height:5000
-						,width:<?php echo $w_column?>
-						,clearBeforeDraw:true
-						,id:'Layer<?php echo $w_id; ?>'
+						id:'Layer<?php echo $w_id; ?>'
 					});
 
 					layer<?php echo $w_id; ?>.add( new Konva.Line({

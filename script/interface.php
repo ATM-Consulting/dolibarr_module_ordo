@@ -16,12 +16,12 @@ function _get(&$db, $case) {
 global $conf;
 
 	switch ($case) {
-		
+
 		case 'logged-status':
 			echo 'ok';
-			
+
 			break;
-		
+
 		case 'tasks' :
 
 			$onlyUseGrid = isset($_REQUEST['gridMode']) && $_REQUEST['gridMode']==1 && empty($conf->global->SCRUM_ALLOW_ALL_TASK_IN_GRID) ? true : false;
@@ -33,7 +33,7 @@ global $conf;
 			}
 
 			header("Content-type: text/javascript");
-			header('Content-Encoding: gzip'); 
+			header('Content-Encoding: gzip');
 			print gzencode(json_encode($Tab),9);
 
 			break;
@@ -168,7 +168,7 @@ function _put(&$db, $case) {
             break;
 
         case 'ws':
-            print json_encode( _task_ws($db, GETPOST('taskid'), GETPOST('fk_workstation')) );
+            print json_encode( _task_ws($db, GETPOST('taskid'), GETPOST('fk_workstation'),GETPOST('top')) );
 
             break;
 		case 'resize':
@@ -222,9 +222,12 @@ function _sort_task_ws(&$db, &$TTaskId) {
     return 1;
 }
 
-function  _task_ws(&$db, $taskid, $fk_workstation) {
+function  _task_ws(&$db, $taskid, $fk_workstation, $top) {
 	  $TIdTask = array();
-	  TSmallGeoffrey::setTaskWS($TIdTask,$taskid,$fk_workstation);
+
+	  if($top==='')$top=-1;
+
+	  TSmallGeoffrey::setTaskWS($TIdTask,$taskid,$fk_workstation,$top);
       return $TIdTask;
 
 }
@@ -733,19 +736,19 @@ function _task_propal(&$db, $fk_propal) {
 
 function _tasks_ordo(&$db,&$TWorkstation, $status, $fk_workstation=0) {
     global $conf;
-    
+
     $sql = "SELECT t.rowid,t.label,t.ref,t.fk_task_parent,t.fk_projet, t.grid_col,t.grid_row,ex.fk_workstation,ex.needed_ressource
                 ,t.planned_workload,t.progress,t.datee,t.dateo,p.fk_soc,t.date_estimated_end";
-                
+
         if(!empty($conf->asset->enabled)) $sql.= ',ex.fk_product';
 
 		// SCRUM_GROUP_TASK_BY_RAL est la conf qui crée les 2 extrafields au dessous
 		if(!empty($conf->global->SCRUM_GROUP_TASK_BY_RAL)) $sql.= ",ex.fk_product_ral";
 
-    $sql.=" FROM ".MAIN_DB_PREFIX."projet_task t 
+    $sql.=" FROM ".MAIN_DB_PREFIX."projet_task t
         LEFT JOIN ".MAIN_DB_PREFIX."projet p ON (t.fk_projet=p.rowid)
-        LEFT JOIN ".MAIN_DB_PREFIX."projet_task_extrafields ex ON (t.rowid=ex.fk_object) "; 
-        
+        LEFT JOIN ".MAIN_DB_PREFIX."projet_task_extrafields ex ON (t.rowid=ex.fk_object) ";
+
     if($status=='ideas') {
         $sql.=" WHERE t.progress=0 AND t.datee IS NULL";
     }
@@ -833,7 +836,7 @@ function _tasks_ordo(&$db,&$TWorkstation, $status, $fk_workstation=0) {
 function _tasks(&$db, $id_project, $status, $onlyUseGrid = false, $start = null, $limit = null) {
 	global $hookmanager,$conf;
 	$hookmanager->initHooks(array('scrumboardgettasks'));
-	
+
 	$sql = "SELECT t.rowid,t.fk_task_parent, t.grid_col,t.grid_row,ex.fk_workstation,ex.needed_ressource,p.datee as 'project_date_end', t.note_private
 		FROM ".MAIN_DB_PREFIX."projet_task t
 		LEFT JOIN ".MAIN_DB_PREFIX."projet p ON (t.fk_projet=p.rowid)
@@ -884,11 +887,11 @@ function _tasks(&$db, $id_project, $status, $onlyUseGrid = false, $start = null,
     if (!empty($sqlorder)) {
     	$sql .=$sqlorder;
     }
-    
+
     if(!is_null($limit)) {
-    	
+
     	$sql.=' LIMIT '.(int)$start.', '.(int)$limit;
-    	
+
     }
 
 	$parameters=array('action'=>'_tasks_before_exec_sql', 'sql'=>&$sql, 'status'=>$status, 'fk_project'=>$id_project, 'onlyUseGrid'=>$onlyUseGrid);

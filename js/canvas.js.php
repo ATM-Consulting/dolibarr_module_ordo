@@ -244,7 +244,6 @@ function TOrdonnancement() {
 			for(fk_worstation_jo in tasks['dayOff']) {
                 if(fk_worstation_jo>0 && tasks['dayOff'][fk_worstation_jo].length>0) {
 
-                    $('ul[ws-id='+fk_worstation_jo+'] > li.dayoff').remove();
                     $.each(tasks['dayOff'][fk_worstation_jo], function(i, dof) {
 
                              var classOff = 'dayoff';
@@ -253,16 +252,21 @@ function TOrdonnancement() {
                              titleOff = '';
                              if(dof.title!=null)titleOff=dof.title;
 
-                             $('ul[ws-id='+fk_worstation_jo+']').append('<li class="'+classOff+'" jouroff="'+i+'">'+titleOff+'</li>');
+							 var layer = canvasGrid.find('#Layer'+fk_worstation_jo)[0];
 
-                             $li = $('ul[ws-id='+fk_worstation_jo+'] > li[jouroff='+i+']');
-                             //console.log(dof);
-                             $li.css({
-                                    top:dof.top * coef_time
-                                    ,position:'absolute'
-                                    ,width:(width_column * dof.nb_ressource)
-                                    ,height: dof.height * coef_time
-                             });
+                             var jourOff = new Konva.Rect({
+							      x: CanvaWorkstation[fk_worstation_jo].x,
+							      y: dof.top * coef_time,
+							      width: width_column * dof.nb_ressource,
+							      height: dof.height * coef_time,
+							      fill: '#000',
+							      opacity:0.5,
+							      cornerRadius:0,
+							      id:'JourOff'+i
+							 });
+
+							 layer.add(jourOff).draw();
+
 
 
                     });
@@ -793,25 +797,36 @@ function drawTask(idTask) {
 		        clipY:0,
 		        clipWidth:width_column,
 		        clipHeight:task_height,
-		        draggable: true
+		        draggable: true,
+		        idTask:idTask,
+		        fk_workstation:fk_workstation
 		    });
+
+			var bgcolor = '#eeffee';
+			if(task.project && task.project.array_options.options_color!=null) {
+				bgcolor = task.project.array_options.options_color;
+			}
 
 			group.add(new Konva.Rect({
 		      x: 0,
 		      y: 0,
 		      width: width_column,
 		      height: task_height,
-		      fill: 'green',
+		      fill: bgcolor,
 		      stroke: 'black',
 		      strokeWidth: 1,
 		      cornerRadius:0,
 		      id:'Task'+idTask
 		    }));
 
+			var duration = task.planned_workload;
+			var project_title = (task.project) ? task.project.title : "undefined";
+			project_title+=' '+(Math.round(duration / 3600 *100)/100)+'h à '+task.progress+'%';
+
 		    group.add( new Konva.Text({
 				x:10
 				,y:10
-				,text:"["+task.ref+"] "+task.label
+				,text:project_title+"\n["+task.ref+"] "+task.label
 
 		    }));
 
@@ -928,8 +943,6 @@ function drawTask(idTask) {
 
 		date=new Date(task.time_date_end * 1000);
 		if(task.time_date_end>0) $li.find('[rel=time-end]').html(date.toLocaleDateString());
-
-		$li.find('header').html(project_title+' <span class="duration">'+(Math.round(duration / 3600 *100)/100)+'</span>h à <span class="progress">'+task.progress+'</span>%');
 
 	    $li.css('margin-bottom', Math.round( swap_time / nb_hour_per_day * height_day ));
 		$li.css('width', Math.round( (width_column*task.needed_ressource)-2 ));
