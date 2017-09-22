@@ -44,7 +44,6 @@ function ordoGetTask(ordo, start) {
 			}
 			else {
 
-
 			//	$('*.classfortooltip').tipTip({maxWidth: "600px", edgeOffset: 10, delay: 50, fadeIn: 50, fadeOut: 50});
 
 				/*
@@ -241,40 +240,6 @@ function TOrdonnancement() {
 
 			$.jnotify(text_ws, "3000", "false" ,{ remove: function (){} } );
 
-			for(fk_worstation_jo in tasks['dayOff']) {
-                if(fk_worstation_jo>0 && tasks['dayOff'][fk_worstation_jo].length>0) {
-
-                    $.each(tasks['dayOff'][fk_worstation_jo], function(i, dof) {
-
-                             var classOff = 'dayoff';
-                             if(dof.class!=null)classOff+=' '+ dof.class;
-
-                             titleOff = '';
-                             if(dof.title!=null)titleOff=dof.title;
-
-							 var layer = canvasGrid.find('#Layer'+fk_worstation_jo)[0];
-
-                             var jourOff = new Konva.Rect({
-							      x: CanvaWorkstation[fk_worstation_jo].x,
-							      y: dof.top * coef_time,
-							      width: width_column * dof.nb_ressource,
-							      height: dof.height * coef_time,
-							      fill: '#000',
-							      opacity:0.5,
-							      cornerRadius:0,
-							      id:'JourOff'+i
-							 });
-
-							 layer.add(jourOff).draw();
-
-
-
-                    });
-
-                }
-
-			}
-
     		var nb_tasks = tasks['tasks'].length;
 			$.each(tasks['tasks'], function(i, taskordo) {
 
@@ -323,8 +288,154 @@ function TOrdonnancement() {
 
            });
 
-           $('ul.needToResize').css('height', max_height);
+           max_height = parseInt(max_height);
 
+			if(max_height>32767)max_height = 3276; // limit firefox & chrome
+
+			canvasGrid = new Konva.Stage({
+				  container: '#theGrid',
+				  width: total_grid_with,
+				  height:max_height
+			});
+
+
+			var dragLayer =  new Konva.Layer({
+
+			});
+
+			canvasGrid.add(dragLayer);
+
+			canvasGrid.on("dragstart", function(e){
+				obj = e.target;
+				TaskLayer = obj.getLayer();
+
+				/*var tile = obj.find('Rect')[0];
+				tile.shadowBlur(20);
+				tile.shadowColor('yellow');
+				tile.shadowEnabled(true);
+				tile.shadowOffset({x : 10, y : 10});
+				*/
+
+		        obj.moveTo(dragLayer);
+
+
+		        TaskLayer.draw(TaskLayer);
+		        dragLayer.draw(TaskLayer);
+		    });
+
+			canvasGrid.on("dragend", function(e){
+				obj = e.target;
+				obj.moveTo(TaskLayer);
+
+				obj.add(new Konva.Rect({
+				      x: 0,
+				      y: 0,
+				      width: obj.width(),
+				      height: obj.height(),
+				      fill:'yellow',
+				      opacity:0.2
+			    }));
+
+                dragLayer.draw();
+                TaskLayer.draw();
+
+				var x = e.evt.layerX;
+				var y = e.evt.layerX;
+
+				var fk_workstation = 0;
+				for(wsid in CanvaWorkstation) {
+
+					if(x>= CanvaWorkstation[wsid].x && x < CanvaWorkstation[wsid].width+CanvaWorkstation[wsid].x) {
+						fk_workstation = wsid;
+					}
+
+				}
+
+				var taskid = obj.attrs.idTask;
+				var old_wsid = obj.attrs.fk_workstation;
+
+				var top = parseInt(y / (height_day / nb_hour_per_day));
+
+				$.ajax({
+					url : "./script/interface.php"
+					,data: {
+						json:1
+						,put : 'ws'
+						,taskid:taskid
+						,fk_workstation:fk_workstation
+						,top:top
+					}
+					,dataType: 'json'
+				}).done(function(data) {
+
+					$('#refreshOrdo').show();
+
+/*
+					var TWSid = [wsid];
+					if(TWSid.indexOf(old_wsid)) TWSid.push(old_wsid);
+
+					for(x in TWSid) {
+						wsid = TWSid[x];
+					}
+*/
+				});
+
+
+			});
+
+            for(wsid in CanvaWorkstation) {
+
+				var layer = new Konva.Layer({
+					id:'Layer'+wsid
+				});
+
+				var w = CanvaWorkstation[wsid].x + CanvaWorkstation[wsid].width;
+
+				layer.add( new Konva.Line({
+				      points: [w, 0, w, max_height],
+				      stroke: '#999',
+				      strokeWidth: 1,
+				      dash: [5, 10]
+				    }) );
+
+				canvasGrid.add(layer);
+
+			}
+
+
+			for(fk_worstation_jo in tasks['dayOff']) {
+                if(fk_worstation_jo>0 && tasks['dayOff'][fk_worstation_jo].length>0) {
+
+                    $.each(tasks['dayOff'][fk_worstation_jo], function(i, dof) {
+
+                             var classOff = 'dayoff';
+                             if(dof.class!=null)classOff+=' '+ dof.class;
+
+                             titleOff = '';
+                             if(dof.title!=null)titleOff=dof.title;
+
+							 var layer = canvasGrid.find('#Layer'+fk_worstation_jo)[0];
+
+                             var jourOff = new Konva.Rect({
+							      x: CanvaWorkstation[fk_worstation_jo].x,
+							      y: dof.top * coef_time,
+							      width: width_column * dof.nb_ressource,
+							      height: dof.height * coef_time,
+							      fill: '#000',
+							      opacity:0.5,
+							      cornerRadius:0,
+							      id:'JourOff'+i
+							 });
+
+							 layer.add(jourOff).draw();
+
+
+
+                    });
+
+                }
+
+			}
            renderVisibleTask();
 
            $("div.loading-ordo").hide();
@@ -765,11 +876,10 @@ function renderVisibleTask() {
 
 function drawTask(idTask) {
 //console.log(task);
-		task = TTaskCache[idTask];
-		var coef_time = height_day / nb_hour_per_day;
-		$ul = $("div#columm-ws-"+task.fk_workstation);
-
 		if(TTaskOrdo[idTask]) {
+			task = TTaskCache[idTask];
+			var coef_time = height_day / nb_hour_per_day;
+			$ul = $("div#columm-ws-"+task.fk_workstation);
 
 			taskordo = TTaskOrdo[idTask];
 
