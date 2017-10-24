@@ -60,7 +60,7 @@
 	$tm = GETPOST('tilemode');
 	if($tm!=='') $_SESSION['tile_mode'] = (int)$tm;
 	
-    $hour_height = empty($_SESSION['hour_height']) ? 50 : $_SESSION['hour_height'];
+	$hour_height = empty($_SESSION['hour_height']) ? (!empty($conf->global->SCRUM_DEFAULT_HOUR_HEIGHT) ? $conf->global->SCRUM_DEFAULT_HOUR_HEIGHT : 50) : $_SESSION['hour_height'];
     $column_width = empty($_SESSION['column_width']) ? -1 : $_SESSION['column_width'];
     $tile_mode = !isset($_SESSION['tile_mode']) ? 1 : $_SESSION['tile_mode'];
 	$day_height =  $hour_height * 7;

@@ -57,6 +57,7 @@ if (preg_match('/set_(.*)/',$action,$reg))
             $extrafields=new ExtraFields($db);
             $res = $extrafields->addExtraField('grou', 'Priorité', 'select', 1, 0, 'projet', false, false, '', serialize( $default_value ) );
         }*/
+		else if($code == 'SCRUM_DEFAULT_HOUR_HEIGHT') $_SESSION['hour_height'] = GETPOST($code);
 
         setEventMessage( $langs->trans('RegisterSuccess') );
 		header("Location: ".$_SERVER["PHP_SELF"]);
@@ -282,6 +283,39 @@ function showParameters() {
 	print '<td align="center" width="20">&nbsp;</td>';
 	print '<td align="right" width="300">';
 	print ajax_constantonoff('SCRUM_SHOW_SHOW_ESTIMATED_START_END');
+	print '</td></tr>';
+	
+	$var=!$var;
+	print '<tr '.$bc[$var].'>';
+	print '<td>'.$langs->trans("fieldsToHide").'</td>';
+	print '<td align="center" width="20">&nbsp;</td>';
+	print '<td align="right" width="300">';
+	print '<form method="POST" action="'.$_SERVER['PHP_SELF'].'">';
+	print '<input type="hidden" name="token" value="'.$_SESSION['newtoken'].'">';
+	print '<input type="hidden" name="action" value="set_SCRUM_TFIELD_TO_HIDE_ON_TASK_HOVER">';
+	print '<input type="text" name="SCRUM_TFIELD_TO_HIDE_ON_TASK_HOVER" value="'.$conf->global->SCRUM_TFIELD_TO_HIDE_ON_TASK_HOVER.'" />';
+	print '<input type="submit" class="button" value="'.$langs->trans("Modify").'">';
+	print '</form>';
+	
+	$var=!$var;
+	print '<tr '.$bc[$var].'>';
+	print '<td>'.$langs->trans("hideUsers").'</td>';
+	print '<td align="center" width="20">&nbsp;</td>';
+	print '<td align="right" width="300">';
+	print ajax_constantonoff('SCRUM_HIDE_USERS_ON_TASK_HOVER');
+	print '</form>';
+	
+	$var=!$var;
+	print '<tr '.$bc[$var].'>';
+	print '<td>'.$langs->trans("defaultHeight").'</td>';
+	print '<td align="center" width="20">&nbsp;</td>';
+	print '<td align="right" width="300">';
+	print '<form method="POST" action="'.$_SERVER['PHP_SELF'].'">';
+	print '<input type="hidden" name="token" value="'.$_SESSION['newtoken'].'">';
+	print '<input type="hidden" name="action" value="set_SCRUM_DEFAULT_HOUR_HEIGHT">';
+	print '<input type="text" name="SCRUM_DEFAULT_HOUR_HEIGHT" value="'.$conf->global->SCRUM_DEFAULT_HOUR_HEIGHT.'" size="3" />&nbsp;';
+	print '<input type="submit" class="button" value="'.$langs->trans("Modify").'">';
+	print '</form>';
 	print '</td></tr>';
 	
 	print '</table>';
