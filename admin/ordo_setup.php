@@ -296,6 +296,14 @@ function showParameters() {
 	print '<input type="submit" class="button" value="'.$langs->trans("Modify").'">';
 	print '</form>';
 	
+	$var=!$var;
+	print '<tr '.$bc[$var].'>';
+	print '<td>'.$langs->trans("hideUsers").'</td>';
+	print '<td align="center" width="20">&nbsp;</td>';
+	print '<td align="right" width="300">';
+	print ajax_constantonoff('SCRUM_HIDE_USERS_ON_TASK_HOVER');
+	print '</form>';
+	
 	print '</table>';
 }
 ?>

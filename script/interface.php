@@ -474,7 +474,7 @@ global $user, $langs,$conf;
     if($task->date_end>0 && !in_array('date_end', $TFieldToHide)) $task->long_description .= $langs->trans('TaskDateEnd').' : '.dol_print_date($task->date_end).'<br />';
     if($task->date_delivery>0 && $task->date_delivery>$task->date_end && !in_array('date_delivery', $TFieldToHide)) $task->long_description .= $langs->trans('TaskDateShouldDelivery').' : '.dol_print_date($task->date_delivery).'<br />';
 
-	$task->long_description.=$task->description;
+    $task->long_description.=nl2br($task->description);
 
 	$task->project = new Project($db);
 	$task->project->fetch($task->fk_project);
