@@ -469,9 +469,10 @@ global $user, $langs,$conf;
 
     if(!empty($task->note_private)) $task->divers.='<br />'.$task->note_private;
 
-	if($task->date_start>0) $task->long_description .= $langs->trans('TaskDateStart').' : '.dol_print_date($task->date_start).'<br />';
-	if($task->date_end>0) $task->long_description .= $langs->trans('TaskDateEnd').' : '.dol_print_date($task->date_end).'<br />';
-	if($task->date_delivery>0 && $task->date_delivery>$task->date_end) $task->long_description .= $langs->trans('TaskDateShouldDelivery').' : '.dol_print_date($task->date_delivery).'<br />';
+    $TFieldToHide = explode(',', $conf->global->SCRUM_TFIELD_TO_HIDE_ON_TASK_HOVER);
+    if($task->date_start>0 && !in_array('date_start', $TFieldToHide)) $task->long_description .= $langs->trans('TaskDateStart').' : '.dol_print_date($task->date_start).'<br />';
+    if($task->date_end>0 && !in_array('date_end', $TFieldToHide)) $task->long_description .= $langs->trans('TaskDateEnd').' : '.dol_print_date($task->date_end).'<br />';
+    if($task->date_delivery>0 && $task->date_delivery>$task->date_end && !in_array('date_delivery', $TFieldToHide)) $task->long_description .= $langs->trans('TaskDateShouldDelivery').' : '.dol_print_date($task->date_delivery).'<br />';
 
 	$task->long_description.=$task->description;
 
