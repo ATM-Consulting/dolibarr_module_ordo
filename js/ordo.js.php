@@ -4,7 +4,7 @@
 /*
   Get list of orderable task
  */
-       
+/* <script type="text/javascript"> */
 function ordoGetTask(ordo, start) {
  	   var limit = 100;
        
