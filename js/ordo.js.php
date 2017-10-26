@@ -592,16 +592,30 @@ function TOrdonnancement() {
 		var TJour = new Array( "<?php echo $langs->trans('Sunday') ?>", "<?php echo $langs->trans('Monday') ?>", "<?php echo $langs->trans('Tuesday') ?>", "<?php echo $langs->trans('Wednesday') ?>", "<?php echo $langs->trans('Thursday') ?>", "<?php echo $langs->trans('Friday') ?>", "<?php echo $langs->trans('Saturday') ?>" );
 		
 		for(i=0;i<max_height;i+=height_day) {
-			var dayBlock = '<div style="height:'+height_day+'px; top:'+i+'px; right:0;width:'+(width_column-5)+'px; border-bottom:1px solid black; text-align:right;position:absolute;z-index:0;" class="day_delim">'+TJour[date.getDay()]+' '+date.toLocaleDateString()+'&nbsp;</div>';	
+			var dayBlock = '<div style="height:'+height_day+'px; top:'+i+'px; right:0;width:'+(width_column-5)+'px; border-bottom:1px solid black; text-align:right;position:absolute;z-index:0;" class="day_delim"><span class="day_ordo">'+TJour[date.getDay()]+' '+date.toLocaleDateString()+'&nbsp;</span></div>';	
 			$('#list-task-0').append(dayBlock);
 
-			var dayBlock = '<div style="height:'+height_day+'px; top:'+i+'px; left:0;width:'+(width_column-5)+'px; border-bottom:1px solid black; text-align:left;position:absolute;z-index:0;" class="day_delim">'+TJour[date.getDay()]+' '+date.toLocaleDateString()+'</div>';	
+			var dayBlock = '<div style="height:'+height_day+'px; top:'+i+'px; left:0;width:'+(width_column-5)+'px; border-bottom:1px solid black; text-align:left;position:absolute;z-index:0;" class="day_delim"><span class="day_ordo">'+TJour[date.getDay()]+' '+date.toLocaleDateString()+'</span></div>';	
 			$('#list-projects').append(dayBlock);
 		
 			date.setDate(date.getDate() + 1);
 			
 		}
-
+		
+		$('.day_delim span.day_ordo').makeFixed({
+			onFixed:function(el) {
+				$(el).css({
+					left : $(el).attr('data-mfx-left')
+					,top : '45px'
+				});
+			}
+			,onUnFixed:function(el) {
+				$(el).css({
+					left : 0
+				});
+			}
+ 	   	});
+		
 		if($('#list-projects li[fk-project]').length == 0) {
 		
 			for(idProject in TProject) {
