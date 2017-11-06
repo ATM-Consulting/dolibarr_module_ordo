@@ -256,6 +256,11 @@ function TOrdonnancement() {
 		
 		if(task.project && task.project.array_options.options_color!=null) {
 			$li.css('background-color', task.project.array_options.options_color);
+			let rgb = $li.css("background-color");
+			rgb = rgb.replace('rgb', 'rgba');
+			rgb = rgb.replace(')', ', 0.3)');
+			$li.css('background-color', rgb);
+			console.log(rgb);
 			$li.attr('ordo-project-color', task.project.array_options.options_color);
 		}
 		
