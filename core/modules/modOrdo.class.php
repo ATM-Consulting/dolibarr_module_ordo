@@ -195,7 +195,7 @@ class modOrdo extends DolibarrModules
         // Permissions
         $this->rights = array(); // Permission array used by this module
         
-        $r = $this->numero;
+        $r = 0;
         $this->rights[]=array(
             0=>$this->numero . $r
             ,1=>'UseOrdonnancement'
@@ -246,7 +246,6 @@ class modOrdo extends DolibarrModules
             'url'=>'/ordo/grid.php',
             'position'=>300,
             'perms'=>'$user->rights->ordo->ordo',
-            'lang'=>'ordo@ordo',
             'target'=>'',
             'user'=>2);
         $r++;
@@ -254,12 +253,11 @@ class modOrdo extends DolibarrModules
       $this->menu[$r]=array(   'fk_menu'=>'fk_mainmenu=of,fk_leftmenu=ordoGPAO',     // Use r=value where r is index key used for the parent menu entry (higher parent must be a top menu entry)
             'type'=>'left',         // This is a Left menu entry
             'titre'=>'OrdonnancementStat',
-            'mainmenu'=>'ordoGPAO',
+            'mainmenu'=>'of',
             'leftmenu'=>'ordoStat',
             'url'=>'/ordo/grid-stat.php',
-            'position'=>300,
+            'position'=>310,
             'perms'=>'$user->rights->ordo->ordo',
-            'lang'=>'ordo@ordo',
             'target'=>'',
             'user'=>2);
         $r++;
@@ -386,15 +384,15 @@ class modOrdo extends DolibarrModules
 	    $sql = array();
         $result = $this->loadTables();
 		
-		$db->query("ALTER TABLE `".MAIN_DB_PREFIX."projet_task` 
-					ADD `grid_col` FLOAT NOT NULL DEFAULT '0',
-					ADD `grid_row` FLOAT NOT NULL DEFAULT '999999'");		
+		$db->query("ALTER TABLE ".MAIN_DB_PREFIX."projet_task 
+					ADD grid_col FLOAT NOT NULL DEFAULT 0,
+					ADD grid_row FLOAT NOT NULL DEFAULT 999999");		
 	
-		$db->query("ALTER TABLE `".MAIN_DB_PREFIX."projet_task`
+		$db->query("ALTER TABLE ".MAIN_DB_PREFIX."projet_task
 					ADD grid_height FLOAT NOT NULL DEFAULT 0");		
 		
-		$db->query('ALTER TABLE `'.MAIN_DB_PREFIX.'projet_task`
-				ADD INDEX `grid_row_grid_col` (`grid_row`, `grid_col`)');		
+		$db->query('ALTER TABLE '.MAIN_DB_PREFIX.'projet_task
+				ADD INDEX grid_row_grid_col (grid_row, grid_col)');		
 	
 		$db->query('ALTER TABLE '.MAIN_DB_PREFIX.'projet_task
 				ADD INDEX progress (progress)');
@@ -403,8 +401,8 @@ class modOrdo extends DolibarrModules
 				ADD INDEX planned_workload (planned_workload)');		
 	
 			$db->query("ALTER TABLE ".MAIN_DB_PREFIX."projet_task
-				ADD date_estimated_start DATETIME NOT NULL 
-			  , ADD date_estimated_end DATETIME NOT NULL 
+				ADD date_estimated_start DATETIME NULL 
+			  , ADD date_estimated_end DATETIME NULL 
 			  , ADD INDEX (date_estimated_start, date_estimated_end)");
 					
 	
@@ -419,8 +417,6 @@ class modOrdo extends DolibarrModules
 		$extrafields=new ExtraFields($this->db);
 		$res = $extrafields->addExtraField('fk_workstation', 'Poste de charge', 'sellist', 0, '', 'projet_task',0,0,'',serialize(array('options'=>array('workstation:name:rowid'=>null))));
 
-     	$extrafields=new ExtraFields($this->db);
-        $res = $extrafields->addExtraField('fk_of', 'Ordre de Fabrication', 'sellist', 0, '', 'projet_task',0,0,'',serialize(array('options'=>array('assetOf:numero:rowid'=>null))));
         $extrafields=new ExtraFields($this->db);
         $res = $extrafields->addExtraField('fk_product', 'Produit à fabriquer', 'sellist', 0, '', 'projet_task',0,0,'',serialize(array('options'=>array('product:label:rowid'=>null))));
 
@@ -428,7 +424,7 @@ class modOrdo extends DolibarrModules
         $res = $extrafields->addExtraField('fk_workstation', 'Poste de charge immobilisé', 'sellist', 0, '', 'actioncomm',0,0,'',serialize(array('options'=>array('workstation:name:rowid'=>null))));
      	$extrafields=new ExtraFields($this->db);
         $res = $extrafields->addExtraField('needed_ressource', 'nb ressources immobilisées', 'int', 0, '', 'actioncomm');
-		
+        
 		return $this->_init($sql, $options);
     }
     /**

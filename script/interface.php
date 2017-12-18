@@ -29,10 +29,12 @@ global $conf;
 			$var = explode('|',GETPOST('status'));
 			$Tab=array();
 			foreach($var as $statut) {
-				$Tab=array_merge($Tab, _tasks($db, (int)GETPOST('id_project'), $statut, $onlyUseGrid));
+				$Tab=array_merge($Tab, _tasks($db, (int)GETPOST('id_project'), $statut, $onlyUseGrid, GETPOST('start') ? GETPOST('start') : null , GETPOST('limit') ? GETPOST('limit') : null ));
 			}
 
-			print json_encode($Tab);
+			header("Content-type: text/javascript");
+			header('Content-Encoding: gzip'); 
+			print gzencode(json_encode($Tab),9);
 
 			break;
 		case 'task-ordo-simulation':
@@ -100,8 +102,9 @@ global $conf;
 
             }
 
-            print json_encode($Tab);
-
+            header("Content-type: text/javascript");
+            header('Content-Encoding: gzip');
+            print gzencode(json_encode($Tab),9);
 
             break;
 
@@ -466,11 +469,12 @@ global $user, $langs,$conf;
 
     if(!empty($task->note_private)) $task->divers.='<br />'.$task->note_private;
 
-	if($task->date_start>0) $task->long_description .= $langs->trans('TaskDateStart').' : '.dol_print_date($task->date_start).'<br />';
-	if($task->date_end>0) $task->long_description .= $langs->trans('TaskDateEnd').' : '.dol_print_date($task->date_end).'<br />';
-	if($task->date_delivery>0 && $task->date_delivery>$task->date_end) $task->long_description .= $langs->trans('TaskDateShouldDelivery').' : '.dol_print_date($task->date_delivery).'<br />';
+    $TFieldToHide = explode(',', $conf->global->SCRUM_TFIELD_TO_HIDE_ON_TASK_HOVER);
+    if($task->date_start>0 && !in_array('date_start', $TFieldToHide)) $task->long_description .= $langs->trans('TaskDateStart').' : '.dol_print_date($task->date_start).'<br />';
+    if($task->date_end>0 && !in_array('date_end', $TFieldToHide)) $task->long_description .= $langs->trans('TaskDateEnd').' : '.dol_print_date($task->date_end).'<br />';
+    if($task->date_delivery>0 && $task->date_delivery>$task->date_end && !in_array('date_delivery', $TFieldToHide)) $task->long_description .= $langs->trans('TaskDateShouldDelivery').' : '.dol_print_date($task->date_delivery).'<br />';
 
-	$task->long_description.=$task->description;
+    $task->long_description.=nl2br($task->description);
 
 	$task->project = new Project($db);
 	$task->project->fetch($task->fk_project);
@@ -827,10 +831,10 @@ function _tasks_ordo(&$db,&$TWorkstation, $status, $fk_workstation=0) {
     return $TTask;
 
 }
-function _tasks(&$db, $id_project, $status, $onlyUseGrid = false) {
+function _tasks(&$db, $id_project, $status, $onlyUseGrid = false, $start = null, $limit = null) {
 	global $hookmanager,$conf;
 	$hookmanager->initHooks(array('scrumboardgettasks'));
-
+	
 	$sql = "SELECT t.rowid,t.fk_task_parent, t.grid_col,t.grid_row,ex.fk_workstation,ex.needed_ressource,p.datee as 'project_date_end', t.note_private
 		FROM ".MAIN_DB_PREFIX."projet_task t
 		LEFT JOIN ".MAIN_DB_PREFIX."projet p ON (t.fk_projet=p.rowid)
@@ -881,6 +885,12 @@ function _tasks(&$db, $id_project, $status, $onlyUseGrid = false) {
     if (!empty($sqlorder)) {
     	$sql .=$sqlorder;
     }
+    
+    if(!is_null($limit)) {
+    	
+    	$sql.=' LIMIT '.(int)$start.', '.(int)$limit;
+    	
+    }
 
 	$parameters=array('action'=>'_tasks_before_exec_sql', 'sql'=>&$sql, 'status'=>$status, 'fk_project'=>$id_project, 'onlyUseGrid'=>$onlyUseGrid);
 	$reshook=$hookmanager->executeHooks('doScrumActions',$parameters);
@@ -905,7 +915,10 @@ function _tasks(&$db, $id_project, $status, $onlyUseGrid = false) {
 			 );
 		}
 	}
-
+	else {
+		var_dump($db);
+		exit;
+	}
 
 	return $TTask;
 }

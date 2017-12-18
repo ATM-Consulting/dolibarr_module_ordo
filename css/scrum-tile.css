@@ -18,6 +18,7 @@ table li div[rel="content"] {
 
 table li:hover div[rel="content"] {
 	display:block;
+	background:#fff;
 }
 .gridster li[task-id] {
 	border :1px solid #777;

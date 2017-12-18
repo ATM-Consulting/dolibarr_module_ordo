@@ -26,6 +26,12 @@ td.projectDrag {
 	line-height: 40px;
 }
 
+.day_ordo {
+	background:rgb(255, 235, 217) none repeat scroll 0% 0%;
+	display:inline-block;
+	width:100%;
+}
+
 .projectDrag ul {
 	margin:0 0 0 0;
 	padding:0 0 0 0;

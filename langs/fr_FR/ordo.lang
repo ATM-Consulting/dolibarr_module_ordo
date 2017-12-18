@@ -52,6 +52,9 @@ WhenEndOrdo=Heure où fini l'ordonnancement
 SetSCRUM_ALLOW_ALL_TASK_IN_GRID=Ordonnancer toutes les tâches sans distinction
 hideProjectsOnTheRight=Masquer la liste des projets sur la droite de l'ordonnancement
 showLinkedContactToTask=Afficher les contacts liés
+fieldsToHide=Champs à masquer au survol d'une tâche (champ1,champ2,champ3)
+hideUsers=Masquer les utilisateurs au survol d'une tâche
+defaultHeight=Hauteur par défaut d'une heure (sera écrasée en variable de session si modification de la part de l'utilisateur)
 
 #NOMBRE DE PROJETS PAR CHEF DE PROJET 
 graphProjectCDP=Nombre de projets par chef de projet
@@ -63,3 +66,5 @@ RALLinkedToOrder=RAL liée à la commande
 showTaskWithoutDuration=Afficher les taches même si elles n'ont pas de durée plannifiée prévue
 
 SCRUM_SHOW_SHOW_ESTIMATED_START_END=Voir les dates estimées de début et fin dans l'ordo
+	 	
+ORDO_ELASTIC_TASK=Les tâches s'étirent par délà les jours sans activités

@@ -8,6 +8,7 @@ $.fn.makeFixed = function (options)
 {
 
 	var sel = $(this).selector;
+	if (typeof sel == 'undefined') sel = $(this).enableSelection();
 
 	var el;
 	var elc;
