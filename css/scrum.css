@@ -396,7 +396,7 @@ ul {
 .gridster li:hover {
 	overflow:visible;
 	z-index:999;
-	
+	height:auto !important;
 }
 .gridster li:hover div[rel=content] {
 /*	background-color: white;*/	
