@@ -551,6 +551,7 @@ function _split_task($taskid, $task1time, $task2time) {
     $task->update($user);
 
     $task2 = new Task($db);
+    $task2->progress = '0';
     foreach($task as $k=>$v) {
 
         if($k!='id' && $k!='progress' &$k!='duration_effective' && $k!='ref' ) {
@@ -558,7 +559,6 @@ function _split_task($taskid, $task1time, $task2time) {
         }
 
     }
-
     $task2->planned_workload = $task2time * 3600;
 
     $defaultref='';

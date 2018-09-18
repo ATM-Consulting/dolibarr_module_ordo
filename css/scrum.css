@@ -1,4 +1,3 @@
-
 #scrum {
 	width:100%;
 	border-spacing: 10px;
@@ -280,8 +279,9 @@ ul {
 
 .gridster ul {
    /* background-color: #EFEFEF;*/
-  padding:10px 0 10px 0; 
+  padding:10px 0 10px 0;
 }
+
 
 .gridster li {
     font-size: 1em;
@@ -396,7 +396,7 @@ ul {
 .gridster li:hover {
 	overflow:visible;
 	z-index:999;
-	
+	height:auto !important;
 }
 .gridster li:hover div[rel=content] {
 /*	background-color: white;*/	
