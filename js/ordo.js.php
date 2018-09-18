@@ -957,17 +957,16 @@ OrdoSplitTask = function(taskid, min, max) {
 
 
 OrdoSplitTaskEclatec = function(task) {
-	
-	task.description = task.description.replace(/\nOF/g,"ATMCONSULTING\nOF");
-	task.description = task.description.replace(/\n.*ATMCONSULTING/g, 'ATMCONSULTING');
-	console.log(task.description);
+	var desc = task.description;
+	desc = desc.replace(/\nOF/g,"ATMCONSULTING\nOF");
+	desc = desc.replace(/\n.*ATMCONSULTING/g, 'ATMCONSULTING');
+	console.log(desc);
 	$('#splitEclatec').remove();
     $('body').append('<div id="splitEclatec"><div><label></label></div><div style="padding:20px;position:relative;" ><select id="eclatec" multiple="multiple"></select></div></div>');
 	
-	task.description.split('ATMCONSULTING').forEach(function(element){
+	desc.split('ATMCONSULTING').forEach(function(element){
 		element = element.substring(0,13);
-		
-		$('#eclatec').append('<option value="'+element+'">'+element+'</option>');
+		if(element.indexOf('----') == -1)$('#eclatec').append('<option value="'+element+'">'+element+'</option>');
 	});
 	$('#eclatec').multiSelect();
 	
