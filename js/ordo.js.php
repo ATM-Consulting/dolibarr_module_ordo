@@ -5,6 +5,8 @@
   Get list of orderable task
  */
 /* <script type="text/javascript"> */
+	
+
 function ordoGetTask(ordo, start) {
  	   var limit = 100;
        
@@ -741,6 +743,27 @@ TWorkstation = function() {
     this.id = 'idws';
     
 };
+ToggleOrder = function() {
+	
+	$('li[task-id]').each(function(i,item) {
+    	$li = $(item);
+    	$li.css("opacity",1);
+ 	});
+	 $search = $("#search_order").val();
+	if($search) {
+		
+			$('li[task-id] span[rel=label]:not(:contains('+$("#search_order").val()+'))').closest("li").each(function(i,item) {
+	    	$li = $(item);
+	    	$li.css("opacity",.2);
+	 	});
+
+	
+	} else {
+	
+	}	
+	
+};	
+
 
 toggleWorkStation = function (fk_ws, justMe) {
 	console.log(fk_ws, $('#columm-ws-'+fk_ws).is(':visible'));
@@ -833,6 +856,8 @@ ToggleProject = function(fk_project, showAll) {
 		
 	}
 };
+
+
 
 OrdoToggleContact = function($check) {
 	

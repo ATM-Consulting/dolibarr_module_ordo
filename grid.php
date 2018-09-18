@@ -97,7 +97,9 @@
                         <a  class="columnHeader columnHeaderMini <?php echo ($hour_height==100 ? 'columnSelectedValue' : '') ?>" href="?hour_height=100"><?php echo $langs->trans('High') ?></a>
                         -
                         <a  class="columnHeader columnHeaderMini <?php echo ($tile_mode==1 ? 'columnSelectedValue' : '') ?>" href="?tilemode=<?php echo ($tile_mode) ? 0 : 1;  ?>"><?php echo img_picto($langs->trans('TileModeSwitch'), 'tile@ordo') ?></a>
-                        <br />
+						&nbsp;&nbsp;<span>Commande : </span><input id="search_order" type="text" onkeyup="ToggleOrder()"/>
+						
+						<br />
                         <?php echo $langs->trans('ColumnWidth') ?> : 
                         <a class="columnHeader columnHeaderMini <?php echo ($column_width==-1 ? 'columnSelectedValue' : '') ?>" href="?column_width=-1"><?php echo $langs->trans('Auto') ?></a> 
                         <a class="columnHeader columnHeaderMini <?php echo ($column_width==50 ? 'columnSelectedValue' : '') ?>" href="?column_width=50"><?php echo $langs->trans('TooSmall') ?></a> 
@@ -302,7 +304,7 @@ function _draw_grid(&$TWorkstation, $column_width) {
                     <div rel="users"></div>
     				<div rel="time-end"></div>
     				<a href="javascript:;" class="button split" title="<?php echo $langs->trans('SplitTask'); ?>">x</a>
-					<a href="javascript:;" class="button split-eclatec" title="<?php echo $langs->trans('SplitTaskEclatec'); ?>">x</a>
+					<a href="javascript:;" class="button split-eclatec" title="<?php echo $langs->trans('SplitTaskEclatec'); ?>"> </a>
 				</div> 
 				<div class="loading"></div>
 			</li>
