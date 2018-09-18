@@ -615,19 +615,28 @@ function _split_task_eclatec($taskFrom, $TSelectedOF) {
 		
 		$newTask->description = '';
 		$parameters=array();
+		
 		foreach($comm->lines as $line){
-			if($line->product_type==Product::TYPE_SERVICE){
+			
+			if($line->fk_product_type==Product::TYPE_SERVICE || $line->product_type==Product::TYPE_SERVICE){
+				
 				$parameters['line'] = $line;
 				$newTask->description.= getCommandeLineDesc($comm, $parameters, $newTask->description);
 			}
 		}
+		$pos = strpos($task->description,$newTask->description);
+		if(!empty($pos)){
+			$task->description = substr_replace($task->description, '', $pos-68, 68);
+			
+		}
 		$task->description = str_replace($newTask->description, '',$task->description);
+		
 		
 		$newTask->fk_project = $task->fk_project;
 		$newTask->date_c = dol_now();
 		$newTask->fk_task_parent = 0;
 		$newTask->date_start = $task->date_start;
-		$newTask->progress = 0;
+		$newTask->progress = "0";
 		$newTask->array_options['options_fk_workstation'] = $task->array_options['options_fk_workstation'] ;
 		$newTask->array_options['options_soldprice'] = $comm->total_ht;
 		$task->array_options['options_soldprice'] -=$comm->total_ht;
@@ -637,7 +646,6 @@ function _split_task_eclatec($taskFrom, $TSelectedOF) {
 		
 		
 	}
-//exit;
     $task->planned_workload -= $planned_workload_to_remove;
     $task->update($user);
 
