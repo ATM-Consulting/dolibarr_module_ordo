@@ -508,6 +508,17 @@ table li span[rel=task-link] {
 	height: 32px;
 }
 
+.gridster li a.split-eclatec {
+	display: block;
+	position : absolute;
+	bottom : 5px;
+	left: 42px;
+	background: #bbbbbb url("../img/split.png") center center;
+	
+	width:32px;
+	height: 32px;
+}
+
 li div[rel=users] {
 	margin-top:20px;
 	

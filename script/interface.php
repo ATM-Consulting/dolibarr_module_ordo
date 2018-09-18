@@ -4,6 +4,8 @@ require ('../config.php');
 
 if($conf->of->enabled)dol_include_once('/of/class/ordre_fabrication_asset.class.php');
 else if($conf->asset->enabled) dol_include_once('/asset/class/ordre_fabrication_asset.class.php'); //OLD
+dol_include_once('/commande/class/commande.class.php');
+dol_include_once('/clieprolor/lib/clieprolor.lib.php');
 
 
 $get = GETPOST('get','alpha');
@@ -138,6 +140,15 @@ function _put(&$db, $case) {
 
             $task2id = _split_task(GETPOST('taskid'),GETPOST('tache1'),GETPOST('tache2'));
             print json_encode(_task($db, $task2id));
+
+            break;
+		
+		 case 'splitEclatec':
+
+            $taskIds = _split_task_eclatec(GETPOST('task'),GETPOST('selectedOFs'));
+			foreach($taskIds as $taskId){ 
+				print json_encode(_task($db, $taskId));
+			}
 
             break;
 		case 'task' :
@@ -577,6 +588,62 @@ function _split_task($taskid, $task1time, $task2time) {
     $task2->create($user);
 
     return $task2->id;
+}
+
+
+function _split_task_eclatec($taskFrom, $TSelectedOF) {
+    global $db, $user, $conf;
+
+    $task =new Task($db);
+    $task->fetch($taskFrom);
+    $task->fetch_optionals($task->id); // Nécessaire de préciser l'id jusqu'à la version 3.8
+	$planned_workload_to_remove=0;
+	$TIdTasks = array();
+	
+	foreach($TSelectedOF as $refOrder){
+		$comm = new Commande($db);
+		$comm->fetch(0,$refOrder);
+		$comm->fetch_thirdparty();
+		$planned_workload = $comm->total_ht/300*3600;
+		$planned_workload_to_remove += $planned_workload;
+		$newTask = new Task($db);
+		
+		$newTask->ref =  $conf->global->DOC2PROJECT_TASK_REF_PREFIX.$comm->lines[0]->rowid;
+		$newTask->planned_workload = $planned_workload;
+		$ral_label = getRALLabel($comm);
+		$newTask->label = $comm->thirdparty->name .' - '.$refOrder.' : '.$ral_label ;
+		
+		$newTask->description = '';
+		$parameters=array();
+		foreach($comm->lines as $line){
+			if($line->product_type==Product::TYPE_SERVICE){
+				$parameters['line'] = $line;
+				$newTask->description.= getCommandeLineDesc($comm, $parameters, $newTask->description);
+			}
+		}
+		$task->description = str_replace($newTask->description, '',$task->description);
+		
+		$newTask->fk_project = $task->fk_project;
+		$newTask->date_c = dol_now();
+		$newTask->fk_task_parent = 0;
+		$newTask->date_start = $task->date_start;
+		$newTask->progress = 0;
+		$newTask->array_options['options_fk_workstation'] = $task->array_options['options_fk_workstation'] ;
+		$newTask->array_options['options_soldprice'] = $comm->total_ht;
+		$task->array_options['options_soldprice'] -=$comm->total_ht;
+		$newTask->array_options['options_fk_product_ral'] = $task->array_options['options_fk_product_ral'];
+		
+		$TIdTasks[] = $newTask->create($user);
+		
+		
+	}
+//exit;
+    $task->planned_workload -= $planned_workload_to_remove;
+    $task->update($user);
+
+   
+
+    return $TIdTasks;
 }
 
 function _get_delivery_date_with_velocity(&$db, &$task, $velocity, $time=null) {

@@ -65,7 +65,7 @@
     $tile_mode = !isset($_SESSION['tile_mode']) ? 1 : $_SESSION['tile_mode'];
 	$day_height =  $hour_height * 7;
 
-	llxHeader('', $langs->trans('GridTasks') , '','',0,0, array('/ordo/js/scrum.js.php'));
+	llxHeader('', $langs->trans('GridTasks') , '','',0,0, array('/ordo/js/scrum.js.php','/ordo/lib/multiselect/js/jquery.multi-select.js'),array('/ordo/lib/multiselect/css/multi-select.css'));
 
 	$form = new Form($db);
 
@@ -302,6 +302,7 @@ function _draw_grid(&$TWorkstation, $column_width) {
                     <div rel="users"></div>
     				<div rel="time-end"></div>
     				<a href="javascript:;" class="button split" title="<?php echo $langs->trans('SplitTask'); ?>">x</a>
+					<a href="javascript:;" class="button split-eclatec" title="<?php echo $langs->trans('SplitTaskEclatec'); ?>">x</a>
 				</div> 
 				<div class="loading"></div>
 			</li>

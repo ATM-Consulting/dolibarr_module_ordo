@@ -276,9 +276,15 @@ function TOrdonnancement() {
 		$li.attr('ordo-planned-workload',task.planned_workload);
 		$li.attr('ordo-duration-effective',task.duration_effective);
 		
-		 
+		if(task.label.indexOf("ECLATEC") == -1){
+			$li.find('.split-eclatec').hide();
+		}
 		$li.find('a.split').click(function() {
 			OrdoSplitTask(task.id, (duration/3600) * (task.progress / 100) ,duration/3600);
+		});
+		
+		$li.find('a.split-eclatec').click(function() {
+			OrdoSplitTaskEclatec(task);
 		});
 		$li.find('div[rel=time-rest]').html(task.aff_time_rest);
 		
@@ -921,6 +927,62 @@ OrdoSplitTask = function(taskid, min, max) {
 			$("#splitSlider label").attr("tache2", max - val);
 		}
 	});
+	
+};
+
+
+OrdoSplitTaskEclatec = function(task) {
+	
+	task.description = task.description.replace(/\nOF/g,"ATMCONSULTING\nOF");
+	task.description = task.description.replace(/\n.*ATMCONSULTING/g, 'ATMCONSULTING');
+	console.log(task.description);
+	$('#splitEclatec').remove();
+    $('body').append('<div id="splitEclatec"><div><label></label></div><div style="padding:20px;position:relative;" ><select id="eclatec" multiple="multiple"></select></div></div>');
+	
+	task.description.split('ATMCONSULTING').forEach(function(element){
+		element = element.substring(0,13);
+		
+		$('#eclatec').append('<option value="'+element+'">'+element+'</option>');
+	});
+	$('#eclatec').multiSelect();
+	
+	var taskid = task.id;
+	$('#splitEclatec').dialog({
+		title:"Sélectionnez comment diviser la tâche"
+		,modal:true
+		,draggable: false
+		,resizable: false
+		,width: 450
+		,height: 400
+		,buttons:[
+            {
+              text: 'Split',
+              click: function() {
+                var selectedOF = [];
+				$("#ms-eclatec .ms-selected[style='']").find('span').each(function(index, elem){
+					let text = $(this).text().replace('\n','');
+					selectedOF.push(text);
+				});
+                $.ajax({
+                   url : "script/interface.php"
+                   ,data:{
+                       'put':'splitEclatec'
+                       ,'task':taskid
+                       ,'selectedOFs':selectedOF
+                      
+                       
+                   } 
+                }).done(function(task) {
+                	window.location.reload();
+                });  
+                  
+                $( this ).dialog( "close" );
+              }
+            }
+          ]
+	});
+	
+	
 	
 };
 
