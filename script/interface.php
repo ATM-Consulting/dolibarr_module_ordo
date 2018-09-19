@@ -624,13 +624,24 @@ function _split_task_eclatec($taskFrom, $TSelectedOF) {
 				$newTask->description.= getCommandeLineDesc($comm, $parameters, $newTask->description);
 			}
 		}
-		$pos = strpos($task->description,$newTask->description);
-		if(!empty($pos)){
-			$task->description = substr_replace($task->description, '', $pos-68, 68);
-			
+
+		$TPatterns = preg_split('/(OF[0-9]{4}\-[0-9]{5})/', $task->description, -1, PREG_SPLIT_DELIM_CAPTURE);
+
+		$newDesc = '';
+		$keyToDiscard = -1;
+
+		foreach($TPatterns as $key => $pattern)
+		{
+			if($pattern != $comm->ref) {
+				if($key != $keyToDiscard) {
+					$newDesc .= $pattern;
+				}
+			} else {
+				$keyToDiscard = $key + 1;
+			}
 		}
-		$task->description = str_replace($newTask->description, '',$task->description);
-		
+
+		$task->description = $newDesc;
 		
 		$newTask->fk_project = $task->fk_project;
 		$newTask->date_c = dol_now();
