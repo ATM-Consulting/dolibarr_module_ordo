@@ -219,6 +219,7 @@ function TOrdonnancement() {
 		$li.attr('task-id', task.id);
 		
 		$li.find('[rel=label]').html(task.label).attr("title", task.long_description);
+		$li.find('[rel=label]').html(task.label).attr("data-title", task.long_description);
 		$li.find('[rel=divers]').html(task.divers);
 		
 		$li.find('[rel=ref]').html(task.ref)
@@ -752,13 +753,15 @@ ToggleOrder = function() {
 	 $search = $("#search_order").val();
 	if($search) {
 		
-			$('li[task-id] span[rel=label]:not(:contains('+$("#search_order").val()+'))').closest("li").each(function(i,item) {
+		$('li[task-id]').filter(function(){
+			return ($(this).find("span[rel=label]").text().toLowerCase().indexOf($search.toLowerCase()) == -1) && (($(this).find("span[rel=label]").attr('data-title').toLowerCase().indexOf($search.toLowerCase()) == -1));
+	
+		}).closest("li").each(function(i,item) {
 	    	$li = $(item);
 	    	$li.css("opacity",.2);
 	 	});
-
 	
-	} else {
+
 	
 	}	
 	
