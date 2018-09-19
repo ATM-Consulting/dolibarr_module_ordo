@@ -618,7 +618,7 @@ function _split_task_eclatec($taskFrom, $TSelectedOF) {
 		
 		foreach($comm->lines as $line){
 			
-			if($line->fk_product_type==Product::TYPE_SERVICE || $line->product_type==Product::TYPE_SERVICE){
+			if(($line->fk_product_type==Product::TYPE_SERVICE || $line->product_type==Product::TYPE_SERVICE) && $line->subprice !=0){
 				
 				$parameters['line'] = $line;
 				$newTask->description.= getCommandeLineDesc($comm, $parameters, $newTask->description);
