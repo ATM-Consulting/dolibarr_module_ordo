@@ -215,7 +215,7 @@ function TOrdonnancement() {
     */
     this.addTask = function(task) {
         $li = $('li#task-blank').clone();
-				
+
 		$li.attr('task-id', task.id);
 		
 		$li.find('[rel=label]').html(task.label).attr("title", task.long_description);
@@ -278,7 +278,6 @@ function TOrdonnancement() {
 		$li.attr('ordo-progress',task.progress);
 		$li.attr('ordo-planned-workload',task.planned_workload);
 		$li.attr('ordo-duration-effective',task.duration_effective);
-		
 		if(task.label.indexOf("ECLATEC") == -1){
 			$li.find('.split-eclatec').hide();
 		}
@@ -930,7 +929,10 @@ OrdoSplitTask = function(taskid, min, max) {
                        
                    } 
                 }).done(function(task) {
-                	console.log(task);
+                
+					task = JSON.parse(task);
+					console.log(task);
+
                     document.ordo.addTask(task);
                     
                     $li = $('li#task-'+taskid);

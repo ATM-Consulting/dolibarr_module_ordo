@@ -492,7 +492,7 @@ global $user, $langs,$conf;
 	$task->project->fetch_optionals($task->fk_project,'color');
 
 	if (!empty($conf->global->SCRUM_SHOW_LINKED_CONTACT)) getTContact($task);
-
+	$task->fk_workstation = $task->array_options['options_fk_workstation'];
 	return _as_array($task);
 }
 
@@ -585,7 +585,7 @@ function _split_task($taskid, $task1time, $task2time) {
 
     $task2->ref = $defaultref;
 
-    $task2->create($user);
+	$task2->create($user);
 
     return $task2->id;
 }
