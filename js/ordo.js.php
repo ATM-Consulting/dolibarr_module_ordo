@@ -372,7 +372,7 @@ function TOrdonnancement() {
                 if(fk_worstation_jo>0 && tasks['dayOff'][fk_worstation_jo].length>0) {
                     
                     $('ul[ws-id='+fk_worstation_jo+'] > li.dayoff').remove();
-                    $.each(tasks['dayOff'][fk_worstation_jo], function(i, dof) {order
+                    $.each(tasks['dayOff'][fk_worstation_jo], function(i, dof) {
                               
                              var classOff = 'dayoff';
                              if(dof.class!=null)classOff+=' '+ dof.class;
@@ -380,7 +380,7 @@ function TOrdonnancement() {
                              titleOff = '';
                              if(dof.title!=null)titleOff=dof.title; 
                               
-                             $('ul[ws-id='+fk_worstation_jo+']').append('<li class="'+classOff+'" jouroff="'+i+'">'+titleOff+'</li>');
+//                             $('ul[ws-id='+fk_worstation_jo+']').append('<li class="'+classOff+'" jouroff="'+i+'">'+titleOff+'</li>');
                          
                              $li = $('ul[ws-id='+fk_worstation_jo+'] > li[jouroff='+i+']');
                              //console.log(dof);
@@ -401,9 +401,11 @@ function TOrdonnancement() {
 			
 			
 			var nb_tasks = tasks['tasks'].length;
+            let offset = tasks['tasks'][0].grid_row;
+
 			$.each(tasks['tasks'], function(i, task) {
 				//console.log(task);
-				task_top = coef_time * task.grid_row/* / TVelocity[task.fk_workstation]*/; // vélocité déjà dans le top 
+				task_top = coef_time * (task.grid_row-offset)/* / TVelocity[task.fk_workstation]*/; // vélocité déjà dans le top
 			
 				$li = $('li[task-id='+task.id+']');
 				wsid = $li.attr('ordo-ws-id');
