@@ -64,6 +64,7 @@
     $column_width = empty($_SESSION['column_width']) ? -1 : $_SESSION['column_width'];
     $tile_mode = !isset($_SESSION['tile_mode']) ? 1 : $_SESSION['tile_mode'];
 	$day_height =  $hour_height * 7;
+    if($hour_height == 150) $day_height = $hour_height;
 
 	llxHeader('', $langs->trans('GridTasks') , '','',0,0, array('/ordo/js/scrum.js.php','/ordo/lib/multiselect/js/jquery.multi-select.js'),array('/ordo/lib/multiselect/css/multi-select.css'));
 
@@ -95,6 +96,7 @@
                         <a class="columnHeader  columnHeaderMini <?php echo ($hour_height==10 ? 'columnSelectedValue' : '') ?>" href="?hour_height=10"><?php echo $langs->trans('Small') ?></a> 
                         <a  class="columnHeader columnHeaderMini <?php echo ($hour_height==50 ? 'columnSelectedValue' : '') ?>" href="?hour_height=50"><?php echo $langs->trans('Middle') ?></a> 
                         <a  class="columnHeader columnHeaderMini <?php echo ($hour_height==100 ? 'columnSelectedValue' : '') ?>" href="?hour_height=100"><?php echo $langs->trans('High') ?></a>
+                        <a  class="columnHeader columnHeaderMini <?php echo ($hour_height==150 ? 'columnSelectedValue' : '') ?>" href="?hour_height=150"><?php echo $langs->trans('FixedHeight') ?></a>
                         -
                         <a  class="columnHeader columnHeaderMini <?php echo ($tile_mode==1 ? 'columnSelectedValue' : '') ?>" href="?tilemode=<?php echo ($tile_mode) ? 0 : 1;  ?>"><?php echo img_picto($langs->trans('TileModeSwitch'), 'tile@ordo') ?></a>
 						&nbsp;&nbsp;<span>Commande : </span><input id="search_order" type="text" onkeyup="ToggleOrder()"/>

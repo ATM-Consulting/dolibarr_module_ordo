@@ -252,6 +252,7 @@ function TOrdonnancement() {
 		$li.css('width', Math.round( (width_column*task.needed_ressource)-2 ));
 		
 		var ordo_height = Math.round( height_day/TVelocity[task.fk_workstation]*(height/nb_hour_per_day)  );
+        if(height_day === 150) ordo_height = height_day;
 		
 		if(isNaN(ordo_height)) ordo_height = 100;
 		
@@ -403,12 +404,19 @@ function TOrdonnancement() {
 			var nb_tasks = tasks['tasks'].length;
             let offset = tasks['tasks'][0].grid_row;
 
+            Tab = [];
 			$.each(tasks['tasks'], function(i, task) {
 				//console.log(task);
 				task_top = coef_time * (task.grid_row-offset)/* / TVelocity[task.fk_workstation]*/; // vélocité déjà dans le top
 			
 				$li = $('li[task-id='+task.id+']');
 				wsid = $li.attr('ordo-ws-id');
+
+                if(Tab[wsid] === undefined) Tab[wsid] = 0;
+                else Tab[wsid] += 1;
+
+                if(height_day === 150) task_top = height_day*Tab[wsid];
+
 				$li.css('position','absolute');
 				$li.attr('ordo-fktaskparent', task.fk_task_parent);
 				$li.find('[rel=time-projection]').html(task.time_projection);
@@ -440,6 +448,7 @@ function TOrdonnancement() {
 					}
 				}
 				//console.log('ordo', height);
+                if(height_day === 150) height = height_day;
 				$li.attr('ordo-height', height);
 				
 				$li.css('width', Math.round( (width_column*task.needed_ressource)-2 ));
