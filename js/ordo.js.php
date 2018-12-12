@@ -246,7 +246,7 @@ function TOrdonnancement() {
 		date=new Date(task.time_date_end * 1000);
 		if(task.time_date_end>0) $li.find('[rel=time-end]').html(date.toLocaleDateString());
 		
-		$li.find('header').html(project_title+' <span class="duration">'+(Math.round(duration / 3600 *100)/100)+'</span>h à <span class="progress">'+task.progress+'</span>%');
+		$li.find('header').html(project_title+' <span class="description">'+task.description.substring(0, 50)+'</span>');
 	   
 	    $li.css('margin-bottom', Math.round( swap_time / nb_hour_per_day * height_day ));
 		$li.css('width', Math.round( (width_column*task.needed_ressource)-2 ));
