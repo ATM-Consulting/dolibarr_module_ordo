@@ -600,20 +600,22 @@ function _split_task_eclatec($taskFrom, $TSelectedOF) {
 	$planned_workload_to_remove=0;
 	$TIdTasks = array();
 	
+	$newTask = new Task($db);
+	$newTask->label = $task->label;
 	foreach($TSelectedOF as $refOrder){
 		$comm = new Commande($db);
 		$comm->fetch(0,$refOrder);
 		$comm->fetch_thirdparty();
 		$planned_workload = $comm->total_ht/300*3600;
 		$planned_workload_to_remove += $planned_workload;
-		$newTask = new Task($db);
+		//$newTask = new Task($db);
 		
 		$newTask->ref =  $conf->global->DOC2PROJECT_TASK_REF_PREFIX.$comm->lines[0]->rowid;
-		$newTask->planned_workload = $planned_workload;
-		$ral_label = getRALLabel($comm);
-		$newTask->label = $comm->thirdparty->name .' - '.$refOrder.' : '.$ral_label ;
+		$newTask->planned_workload += $planned_workload;
+		//$ral_label = getRALLabel($comm);
+		//$newTask->label = $comm->thirdparty->name .' - '.$refOrder.' : '.$ral_label ;
 		
-		$newTask->description = '';
+		//$newTask->description = '';
 		$parameters=array();
 		
 		foreach($comm->lines as $line){
@@ -643,7 +645,7 @@ function _split_task_eclatec($taskFrom, $TSelectedOF) {
 
 		$task->description = $newDesc;
 		
-		$newTask->fk_project = $task->fk_project;
+		/*$newTask->fk_project = $task->fk_project;
 		$newTask->date_c = dol_now();
 		$newTask->fk_task_parent = 0;
 		$newTask->date_start = $task->date_start;
@@ -651,12 +653,25 @@ function _split_task_eclatec($taskFrom, $TSelectedOF) {
 		$newTask->array_options['options_fk_workstation'] = $task->array_options['options_fk_workstation'] ;
 		$newTask->array_options['options_soldprice'] = $comm->total_ht;
 		$task->array_options['options_soldprice'] -=$comm->total_ht;
-		$newTask->array_options['options_fk_product_ral'] = $task->array_options['options_fk_product_ral'];
+		$newTask->array_options['options_fk_product_ral'] = $task->array_options['options_fk_product_ral'];*/
 		
-		$TIdTasks[] = $newTask->create($user);
+		//$TIdTasks[] = $newTask->create($user);
+
+		$newTask->array_options['options_soldprice']+= $comm->total_ht;
+	        $task->array_options['options_soldprice'] -=$comm->total_ht;
 		
 		
 	}
+
+	$newTask->fk_project = $task->fk_project;
+        $newTask->date_c = dol_now();
+        $newTask->fk_task_parent = 0;
+        $newTask->date_start = $task->date_start;
+        $newTask->progress = "0";
+        $newTask->array_options['options_fk_workstation'] = $task->array_options['options_fk_workstation'] ;
+	$newTask->array_options['options_fk_product_ral'] = $task->array_options['options_fk_product_ral'];
+	$TIdTasks[] = $newTask->create($user);
+
     $task->planned_workload -= $planned_workload_to_remove;
     $task->update($user);
 
