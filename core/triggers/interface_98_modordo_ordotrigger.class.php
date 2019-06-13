@@ -178,6 +178,20 @@ class Interfaceordotrigger
 			
 		
 	   }
+	else if ($action == 'ORDER_CLOSE') {
+		// Passage des tâches du projet à 100 % lorsque commande passée livrée
+		if(!empty($object->fk_project) && !in_array($object->socid, array(100,101))) {
+			require_once DOL_DOCUMENT_ROOT.'/projet/class/project.class.php';
+			$proj = new Project($this->db);
+			$proj->fetch($object->fk_project);
+			$proj->getLinesArray($user);
+
+			foreach($proj->lines as $task) {
+				$task->progress = 100;
+				$task->update($user);
+			}
+		}
+	}
        
         return 0;
     }
