@@ -306,6 +306,7 @@ function _draw_grid(&$TWorkstation, $column_width) {
                     <div rel="users"></div>
     				<div rel="time-end"></div>
     				<a href="javascript:;" class="button split" title="<?php echo $langs->trans('SplitTask'); ?>">x</a>
+    				<a href="javascript:;" class="button move" title="<?php echo $langs->trans('MoveTask'); ?>">x</a>
 					<a href="javascript:;" class="button split-eclatec" title="<?php echo $langs->trans('SplitTaskEclatec'); ?>"> </a>
 				</div> 
 				<div class="loading"></div>

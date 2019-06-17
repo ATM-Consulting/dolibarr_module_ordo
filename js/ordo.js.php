@@ -289,6 +289,11 @@ function TOrdonnancement() {
 		$li.find('a.split-eclatec').click(function() {
 			OrdoSplitTaskEclatec(task);
 		});
+		$li.find('a.move').click(function() {
+			var rank = parseInt(prompt('Rang ?'));
+			if(rank == 0) return false;
+                        updateTaskRank(task.fk_workstation, task.id, rank);
+                });
 		$li.find('div[rel=time-rest]').html(task.aff_time_rest);
 		
 		/*
@@ -1065,3 +1070,21 @@ function testLoginStatus() {
 
 }
 
+
+function updateTaskRank(wsid, taskid, rank) {
+	// Position de la tache
+	var top = parseInt($('#task-'+taskid).css('height'));
+	rank--;
+	// Nouvelle position
+	var newtop = parseInt($('#task-'+taskid).attr('ordo-height')) * rank;
+	// On monte ou on descend la tâche ?
+	var up = (top > newtop) ? 1 : -1;
+	// Décalage de toute les taches pour faire la place
+	$('ul li[ordo-ws-id='+wsid+']').each(function(i,item){
+		var pos = parseInt( $(item).css('top') );
+		$(item).css('top', (pos+up)+'px');
+	});
+	// Repositionnement de la tache
+	$('#task-'+taskid).css('top', newtop+'px');
+	document.ordo._sortTask(wsid);
+}
