@@ -264,7 +264,7 @@ function TOrdonnancement() {
 			rgb = rgb.replace('rgb', 'rgba');
 			rgb = rgb.replace(')', ', 0.3)');
 			$li.css('background-color', rgb);
-			console.log(rgb);
+			//console.log(rgb);
 			$li.attr('ordo-project-color', task.project.array_options.options_color);
 		}
 		

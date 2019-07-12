@@ -28,11 +28,11 @@ global $conf;
 
 			$onlyUseGrid = isset($_REQUEST['gridMode']) && $_REQUEST['gridMode']==1 && empty($conf->global->SCRUM_ALLOW_ALL_TASK_IN_GRID) ? true : false;
 
-			$var = explode('|',GETPOST('status'));
+            $Tstatut = explode('|',GETPOST('status'));
 			$Tab=array();
-			foreach($var as $statut) {
-				$Tab=array_merge($Tab, _tasks($db, (int)GETPOST('id_project'), $statut, $onlyUseGrid, GETPOST('start') ? GETPOST('start') : null , GETPOST('limit') ? GETPOST('limit') : null ));
-			}
+
+			$Tab=array_merge($Tab, _tasks($db, (int)GETPOST('id_project'), $Tstatut, $onlyUseGrid, GETPOST('start') ? GETPOST('start') : null , GETPOST('limit') ? GETPOST('limit') : null ));
+
 
 			header("Content-type: text/javascript");
 			header('Content-Encoding: gzip'); 
@@ -936,7 +936,7 @@ function _tasks(&$db, $id_project, $status, $onlyUseGrid = false, $start = null,
 	global $hookmanager,$conf;
 	$hookmanager->initHooks(array('scrumboardgettasks'));
 	
-	$sql = "SELECT t.rowid,t.fk_task_parent, t.grid_col,t.grid_row,ex.fk_workstation,ex.needed_ressource,p.datee as 'project_date_end', t.note_private
+	$sql = "SELECT t.rowid,t.fk_task_parent, t.grid_col,t.grid_row,ex.fk_workstation,ex.needed_ressource,p.datee as 'project_date_end', t.note_private, rang
 		FROM ".MAIN_DB_PREFIX."projet_task t
 		LEFT JOIN ".MAIN_DB_PREFIX."projet p ON (t.fk_projet=p.rowid)
 		LEFT JOIN ".MAIN_DB_PREFIX."projet_task_extrafields ex ON (t.rowid=ex.fk_object) ";
@@ -948,21 +948,35 @@ function _tasks(&$db, $id_project, $status, $onlyUseGrid = false, $start = null,
 		$sqlwhere[]= " t.planned_workload>0 ";
 	}
 
-	if($status=='ideas') {
-		$sqlwhere[]=" t.progress=0 AND t.datee IS NULL";
-	}
-	else if($status=='todo') {
-		$sqlwhere[]=" t.progress=0";
-	}
-	else if($status=='inprogress|todo') {
-		$sqlwhere[]=" t.progress>=0 AND t.progress<100";
-	}
-	else if($status=='inprogress') {
-		$sqlwhere[]=" t.progress>0 AND t.progress<100";
-	}
-	else if($status=='finish') {
-		$sqlwhere[]=" t.progress=100";
-	}
+	$TStatus = $status;
+	if(!is_array($status)){
+        $TStatus = array($status);
+    }
+
+	if(!empty($TStatus)){
+
+	    $sqlStatus = array();
+
+	    foreach ($TStatus as $statusVal){
+            if ($statusVal == 'ideas') {
+                $sqlStatus[] = " t.progress=0 AND t.datee IS NULL";
+            } else if ($statusVal == 'todo') {
+                $sqlStatus[] = " t.progress=0";
+            } else if ($statusVal == 'inprogress|todo') {
+                $sqlStatus[] = " t.progress>=0 AND t.progress<100";
+            } else if ($statusVal == 'inprogress') {
+                $sqlStatus[] = " t.progress>0 AND t.progress<100";
+            } else if ($statusVal == 'finish') {
+                $sqlStatus[] = " t.progress=100";
+            }
+        }
+
+	    if(!empty($sqlStatus))
+        {
+            $sqlwhere[] = '('.implode(' OR ', $sqlStatus).')';
+        }
+    }
+
 
 	if($id_project) $sqlwhere[]=" t.fk_projet=".$id_project;
 	else $sqlwhere[]=" p.fk_statut IN (0,1)";
