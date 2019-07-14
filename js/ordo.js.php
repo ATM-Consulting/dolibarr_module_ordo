@@ -279,7 +279,7 @@ function TOrdonnancement() {
 		$li.attr('ordo-progress',task.progress);
 		$li.attr('ordo-planned-workload',task.planned_workload);
 		$li.attr('ordo-duration-effective',task.duration_effective);
-		if(task.label.indexOf("ECLATEC") == -1){
+		if(task.label.indexOf("ECLATEC") == -1 && task.label.indexOf("METALEC") == -1){
 			$li.find('.split-eclatec').hide();
 		}
 		$li.find('a.split').click(function() {
