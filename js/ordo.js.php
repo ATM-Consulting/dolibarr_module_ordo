@@ -1072,19 +1072,22 @@ function testLoginStatus() {
 
 
 function updateTaskRank(wsid, taskid, rank) {
-	// Position de la tache
-	var top = parseInt($('#task-'+taskid).css('height'));
-	rank--;
-	// Nouvelle position
-	var newtop = parseInt($('#task-'+taskid).attr('ordo-height')) * rank;
-	// On monte ou on descend la tâche ?
-	var up = (top > newtop) ? 1 : -1;
-	// Décalage de toute les taches pour faire la place
-	$('ul li[ordo-ws-id='+wsid+']').each(function(i,item){
-		var pos = parseInt( $(item).css('top') );
-		$(item).css('top', (pos+up)+'px');
-	});
-	// Repositionnement de la tache
-	$('#task-'+taskid).css('top', newtop+'px');
+	if(rank == 1) {
+		// Cas particulier pour mettre en 1ère position on "pousse" la premiere tache, on ne peut pas mettre la tâche en top = -1 px, sinon pas prise en compte
+		$('#task-'+taskid).css('top', '0px');
+		$('ul li[ordo-ws-id='+wsid+']:first').css('top', '1px');
+	} else {
+		// Position de la tache sélectionnée
+		var top = parseInt($('#task-'+taskid).css('height'));
+		// Nouvelle position = taille d'une tâche * rang
+		rank--;
+		var newtop = parseInt($('#task-'+taskid).attr('ordo-height')) * rank;
+		// On monte ou on descend la tâche ?
+		var up = (top > newtop) ? 1 : -1;
+		// Décalage d'un pixel pour intercaler la tâche
+		newtop -= up;
+		// Repositionnement de la tache
+		$('#task-'+taskid).css('top', newtop+'px');
+	}
 	document.ordo._sortTask(wsid);
 }
