@@ -294,6 +294,8 @@ function TOrdonnancement() {
 			if(rank == 0) return false;
                         updateTaskRank(task.fk_workstation, task.id, rank);
                 });
+		var nb = $('#list-task-'+task.fk_workstation+' li').length;
+		$li.find('a.move').html(nb+1);
 		$li.find('div[rel=time-rest]').html(task.aff_time_rest);
 		
 		/*
@@ -1089,5 +1091,9 @@ function updateTaskRank(wsid, taskid, rank) {
 		// Repositionnement de la tache
 		$('#task-'+taskid).css('top', newtop+'px');
 	}
+	// Save
 	document.ordo._sortTask(wsid);
+	// Modification des rangs
+	var from = parseInt($('#task-'+taskid).find('a.move').html());
+	var to = rank;
 }
