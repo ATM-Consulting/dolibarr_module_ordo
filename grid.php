@@ -51,17 +51,35 @@
 		$number_of_columns+=$w_param['nb_ressource'];
 	}
 
-    $hh =  GETPOST('hour_height');
-    if(!empty($hh)) $_SESSION['hour_height'] = (int)$hh;
+    $hh =  GETPOST('hour_height', 'int', 0, NULL, NULL, 1);
+    if(!empty($hh)){
+        $_SESSION['hour_height'] = (int)$hh;
+    }
+    elseif (isset($_SESSION['hour_height'])){
+        $hh = $_SESSION['hour_height'];
+    }
+    else{
+        // get default value from dolibar conf : admin/defaultvalues.php
+        $hh =  GETPOST('hour_height', 'int');
+    }
     
-    $cw =  GETPOST('column_width');
-    if(!empty($cw)) $_SESSION['column_width'] = (int)$cw;
+    $cw =  GETPOST('column_width', '', 0, NULL, NULL, 1);
+    if(!empty($cw)){
+        $_SESSION['column_width'] = (int)$cw;
+    }
+    elseif (isset($_SESSION['column_width'])){
+        $cw = $_SESSION['column_width'];
+    }
+    else{
+        // get default value from dolibar conf : admin/defaultvalues.php
+        $cw =  GETPOST('column_width', 'int');
+    }
     
 	$tm = GETPOST('tilemode');
 	if($tm!=='') $_SESSION['tile_mode'] = (int)$tm;
 	
-	$hour_height = empty($_SESSION['hour_height']) ? (!empty($conf->global->SCRUM_DEFAULT_HOUR_HEIGHT) ? $conf->global->SCRUM_DEFAULT_HOUR_HEIGHT : 50) : $_SESSION['hour_height'];
-    $column_width = empty($_SESSION['column_width']) ? -1 : $_SESSION['column_width'];
+	$hour_height = empty($hh) ? (!empty($conf->global->SCRUM_DEFAULT_HOUR_HEIGHT) ? $conf->global->SCRUM_DEFAULT_HOUR_HEIGHT : 50) : $hh;
+    $column_width = empty($cw) ? -1 : $cw;
     $tile_mode = !isset($_SESSION['tile_mode']) ? 1 : $_SESSION['tile_mode'];
 	$day_height =  $hour_height * 7;
     if($hour_height == 150) $day_height = $hour_height;
