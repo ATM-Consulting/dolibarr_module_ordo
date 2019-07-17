@@ -1,6 +1,6 @@
 <?php
 
-require ('../config.php');
+require '../config.php';
 
 if($conf->of->enabled)dol_include_once('/of/class/ordre_fabrication_asset.class.php');
 else if($conf->asset->enabled) dol_include_once('/asset/class/ordre_fabrication_asset.class.php'); //OLD
@@ -30,12 +30,33 @@ global $conf;
 
 			$var = explode('|',GETPOST('status'));
 			$Tab=array();
-			foreach($var as $statut) {
-				$Tab=array_merge($Tab, _tasks($db, (int)GETPOST('id_project'), $statut, $onlyUseGrid, GETPOST('start') ? GETPOST('start') : null , GETPOST('limit') ? GETPOST('limit') : null ));
+			foreach($var as $statut){
+				$Tab = array_merge($Tab, _tasks($db, (int) GETPOST('id_project'), $statut, $onlyUseGrid, GETPOST('start')?GETPOST('start'):null, GETPOST('limit')?GETPOST('limit'):null));
 			}
 
+            if($onlyUseGrid) {
+                usort($Tab, function ($a, $b) {
+                    $grid_col = intval($a['grid_col']) - intval($b['grid_col']);
+
+                    if ($grid_col == 0)
+                    {
+                        $grid_row = $a['grid_row'] - $b['grid_row'];
+                        if ($grid_row == 0) {
+                            return intval($a['rang']) - intval($b['rang']);
+                        }
+                        else{
+                            return $grid_row;
+                        }
+                    }
+                    else{
+                        return $grid_col ;
+                    }
+                });
+            }
+
+
 			header("Content-type: text/javascript");
-			header('Content-Encoding: gzip'); 
+			header('Content-Encoding: gzip');
 			print gzencode(json_encode($Tab),9);
 
 			break;
@@ -836,7 +857,7 @@ function _task_propal(&$db, $fk_propal) {
 function _tasks_ordo(&$db,&$TWorkstation, $status, $fk_workstation=0) {
     global $conf;
     
-    $sql = "SELECT t.rowid,t.label,t.ref,t.fk_task_parent,t.fk_projet, t.grid_col,t.grid_row,ex.fk_workstation,ex.needed_ressource
+    $sql = "SELECT t.rowid,t.label,t.ref,t.fk_task_parent,t.fk_projet, t.grid_col,t.grid_row,ex.fk_workstation,ex.needed_ressource, rang
                 ,t.planned_workload,t.progress,t.datee,t.dateo,p.fk_soc,t.date_estimated_end";
                 
         if(!empty($conf->asset->enabled)) $sql.= ',ex.fk_product';
@@ -872,7 +893,7 @@ function _tasks_ordo(&$db,&$TWorkstation, $status, $fk_workstation=0) {
     if(empty($conf->global->SCRUM_ALLOW_ALL_TASK_IN_GRID)) {
 	    $sql.=" AND ex.grid_use=1 ";
     }
-    $sql.=" ORDER BY t.grid_row, t.grid_col ";
+    $sql.=" ORDER BY t.grid_col, t.grid_row  ";
 
     $res = $db->query($sql);
 
@@ -911,6 +932,7 @@ function _tasks_ordo(&$db,&$TWorkstation, $status, $fk_workstation=0) {
                 ,'ref'=>$obj->ref
                 , 'grid_col'=>$obj->grid_col
                 , 'grid_row'=>$obj->grid_row
+                , 'rang'=>$obj->rang
                 ,'fk_workstation'=>$fk_workstation
                 ,'fk_product'=>(int)$obj->fk_product
                 ,'fk_product_ral'=>empty($conf->global->SCRUM_GROUP_TASK_BY_RAL) ? 0 : (int)$obj->fk_product_ral
@@ -936,7 +958,7 @@ function _tasks(&$db, $id_project, $status, $onlyUseGrid = false, $start = null,
 	global $hookmanager,$conf;
 	$hookmanager->initHooks(array('scrumboardgettasks'));
 	
-	$sql = "SELECT t.rowid,t.fk_task_parent, t.grid_col,t.grid_row,ex.fk_workstation,ex.needed_ressource,p.datee as 'project_date_end', t.note_private
+	$sql = "SELECT t.rowid,t.fk_task_parent, t.grid_col,t.grid_row,ex.fk_workstation,ex.needed_ressource,p.datee as 'project_date_end', t.note_private, rang
 		FROM ".MAIN_DB_PREFIX."projet_task t
 		LEFT JOIN ".MAIN_DB_PREFIX."projet p ON (t.fk_projet=p.rowid)
 		LEFT JOIN ".MAIN_DB_PREFIX."projet_task_extrafields ex ON (t.rowid=ex.fk_object) ";
@@ -1012,6 +1034,7 @@ function _tasks(&$db, $id_project, $status, $onlyUseGrid = false, $start = null,
 			 		,'fk_task_parent'=>(int)$obj->fk_task_parent
 			 		,'needed_ressource'=>($obj->needed_ressource ? $obj->needed_ressource : 1)
 			 		,'project_date_end'=>strtotime($obj->project_date_end)
+                    ,'rang' =>$obj->rang
 				)
 			 );
 		}

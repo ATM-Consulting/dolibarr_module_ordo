@@ -8,7 +8,7 @@
 	
 
 function ordoGetTask(ordo, start) {
- 	   var limit = 100;
+ 	   var limit = 1000;
        
        $.ajax({
 			url : "./script/interface.php"
@@ -29,9 +29,7 @@ function ordoGetTask(ordo, start) {
 			if(tasks.length>0) {
 			
 				$.each(tasks, function(i, task) {
-				
 					ordo.addTask(task);
-					
 	            });
 				
 				ordoGetTask(ordo, start + limit);
@@ -132,7 +130,7 @@ function ordoGetTask(ordo, start) {
 					}
 				});
 				
-			
+			    // la on trie
 				ordo.Order();
 				
 				return false;
@@ -188,8 +186,8 @@ function TOrdonnancement() {
     var sortTask = function(wsid, notReOrderAfter) {
     	var TTaskID=[];
 		$('ul li[ordo-ws-id='+wsid+']').each(function(i,item){
-			t = parseInt( $(item).css('top') ) / (height_day / nb_hour_per_day);
-			TTaskID.push( $(item).attr('task-id')+'-'+t);
+			t = parseFloat( $(item).css('top') ) / (height_day / nb_hour_per_day);
+			TTaskID.push( $(item).attr('task-id')+'-'+parseFloat(t));
 		});
 			
 		$.ajax({
@@ -264,7 +262,7 @@ function TOrdonnancement() {
 			rgb = rgb.replace('rgb', 'rgba');
 			rgb = rgb.replace(')', ', 0.3)');
 			$li.css('background-color', rgb);
-			console.log(rgb);
+			//console.log(rgb);
 			$li.attr('ordo-project-color', task.project.array_options.options_color);
 		}
 		
@@ -340,11 +338,13 @@ function TOrdonnancement() {
         TVelocity[w.id] = w.velocity;
         
     };
-    
+
+    // positionne la tache sur l'ecran
     this.Order = function(wsid, nb_ressource) {
     	order(wsid, nb_ressource);	
     }
-    
+
+    // positionne les taches sur l'ecran
     var order = function(wsid, nb_ressource) {
     	$("div.loading-ordo").show('slide', {direction: 'left'}, 500);
     	  
@@ -363,7 +363,7 @@ function TOrdonnancement() {
 			,dataType: 'json'
 		})
 		.done(function (tasks) {
-			//console.log(tasks);document.ordo
+			console.log(tasks);
 			var coef_time = height_day / nb_hour_per_day;
 			
 			
@@ -619,10 +619,14 @@ function TOrdonnancement() {
 		date=new Date();
 		
 		var TJour = new Array( "<?php echo $langs->trans('Sunday') ?>", "<?php echo $langs->trans('Monday') ?>", "<?php echo $langs->trans('Tuesday') ?>", "<?php echo $langs->trans('Wednesday') ?>", "<?php echo $langs->trans('Thursday') ?>", "<?php echo $langs->trans('Friday') ?>", "<?php echo $langs->trans('Saturday') ?>" );
-		
+
+
+        $("#columm-ws-days").css("width", (width_column-5)+'px');
+        $("#columm-ws-days").css("height", (max_height)+'px');
+
 		for(i=0;i<max_height;i+=height_day) {
 			var dayBlock = '<div style="height:'+height_day+'px; top:'+i+'px; right:0;width:'+(width_column-5)+'px; border-bottom:1px solid black; text-align:right;position:absolute;z-index:0;" class="day_delim"><span class="day_ordo">'+TJour[date.getDay()]+' '+date.toLocaleDateString()+'&nbsp;</span></div>';	
-			$('#list-task-0').append(dayBlock);
+			$('#list-days').append(dayBlock);
 
 			var dayBlock = '<div style="height:'+height_day+'px; top:'+i+'px; left:0;width:'+(width_column-5)+'px; border-bottom:1px solid black; text-align:left;position:absolute;z-index:0;" class="day_delim"><span class="day_ordo">'+TJour[date.getDay()]+' '+date.toLocaleDateString()+'</span></div>';	
 			$('#list-projects').append(dayBlock);

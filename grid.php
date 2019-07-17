@@ -251,12 +251,32 @@ function _js_grid(&$TWorkstation, $day_height, $column_width) {
 function _draw_grid(&$TWorkstation, $column_width) {
 	
 	$width_table = 0;
+
+
+
+    $i=0;
+
 	foreach($TWorkstation as $w_id=>&$w_param) {
 	    
 		$back = empty($w_param['background']) ? '' : 'background:'.$w_param['background'].';';
 		$w_column = $column_width*$w_param['nb_ressource'];
 		
-		$width_table+=$w_column;	
+		$width_table+=$w_column;
+
+        if(empty($i)) {
+            ?>
+            <div class="columnordo" id="columm-ws-days" valign="top" style="float:left;margin-right: 5px; width:<?php echo round($w_column); ?>px; <?php echo $back; ?> border-right:2px solid #ddd;z-index:1;" >
+                <div style="width:<?php echo $column_width ?>px; z-index:1;">
+
+                </div>
+                <ul style="position:relative;min-height: 500px;min-width:<?php echo round($w_column); ?>;z-index:10;" id="list-days"  class="task-list">
+
+                </ul>
+            </div>
+            <?php
+            $back = "background: #ebebeb;";
+        }
+
 		?><div class="columnordo" id="columm-ws-<?php echo $w_id; ?>" valign="top" style="float:left;margin-right: 5px; width:<?php echo round($w_column); ?>px; <?php echo $back; ?> border-right:2px solid #ddd;z-index:1;"  ws-nb-ressource="<?php echo $w_param['nb_ressource']; ?>">
 		        <div style="width:<?php echo $column_width ?>px; z-index:1;">
 		        	<span class="fixedHeader columnHeader">
@@ -267,8 +287,8 @@ function _draw_grid(&$TWorkstation, $column_width) {
 						
 				</ul>
 
-		</div><?php 
-		
+		</div><?php
+        $i++;
 	}
 		
 	?>
