@@ -233,8 +233,8 @@ function _js_grid(&$TWorkstation, $day_height, $column_width) {
 					 	    ?>
 					 		
 					 		var w = new TWorkstation();
-                            w.nb_ressource = <?php echo $w_param['nb_ressource']; ?>;
-                            w.velocity = <?php echo $w_param['velocity']; ?>;
+                            w.nb_ressource = <?php echo doubleval($w_param['nb_ressource']); ?>;
+                            w.velocity = <?php echo doubleval($w_param['velocity']); ?>;
                             w.id = "<?php echo $w_id; ?>";
 					 		
 					 		document.ordo.addWorkstation(w);
