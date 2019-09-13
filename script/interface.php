@@ -117,6 +117,7 @@ global $conf;
     			_tasks_ordo($db, $TWorkstation, GETPOST('status'), GETPOST('fk_workstation') )
     			, $TWorkstation
     			, (int)GETPOST('fk_workstation')
+				,false
 			);
 
             if(!empty($conf->global->SCRUM_LINK_EVENT_TO_TASK)) {
