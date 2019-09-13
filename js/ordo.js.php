@@ -292,8 +292,6 @@ function TOrdonnancement() {
 			if(rank == 0) return false;
                         updateTaskRank(task.fk_workstation, task.id, rank);
                 });
-		var nb = $('#list-task-'+task.fk_workstation+' li').length;
-		$li.find('a.move').html(nb+1);
 		$li.find('div[rel=time-rest]').html(task.aff_time_rest);
 		
 		/*
@@ -426,6 +424,7 @@ function TOrdonnancement() {
 
 				$li.css('position','absolute');
 				$li.attr('ordo-fktaskparent', task.fk_task_parent);
+				$li.find('a.move').html(Tab[wsid]+1);
 				$li.find('[rel=time-projection]').html(task.time_projection);
 				
 				$li.find('[rel=users]').empty();
@@ -1080,8 +1079,10 @@ function testLoginStatus() {
 function updateTaskRank(wsid, taskid, rank) {
 	if(rank == 1) {
 		// Cas particulier pour mettre en 1ère position on "pousse" la premiere tache, on ne peut pas mettre la tâche en top = -1 px, sinon pas prise en compte
+		$('ul li[ordo-ws-id='+wsid+']').each(function() {
+			if(parseInt($(this).css('top')) == 0) $(this).css('top', '1px');
+		});
 		$('#task-'+taskid).css('top', '0px');
-		$('ul li[ordo-ws-id='+wsid+']:first').css('top', '1px');
 	} else {
 		// Position de la tache sélectionnée
 		var top = parseInt($('#task-'+taskid).css('height'));
@@ -1097,7 +1098,4 @@ function updateTaskRank(wsid, taskid, rank) {
 	}
 	// Save
 	document.ordo._sortTask(wsid);
-	// Modification des rangs
-	var from = parseInt($('#task-'+taskid).find('a.move').html());
-	var to = rank;
 }
