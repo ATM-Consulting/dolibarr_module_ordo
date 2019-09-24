@@ -1085,7 +1085,7 @@ function updateTaskRank(wsid, taskid, rank) {
 		$('#task-'+taskid).css('top', '0px');
 	} else {
 		// Position de la tache sélectionnée
-		var top = parseInt($('#task-'+taskid).css('height'));
+		var top = parseInt($('#task-'+taskid).css('top'));
 		// Nouvelle position = taille d'une tâche * rang
 		rank--;
 		var newtop = parseInt($('#task-'+taskid).attr('ordo-height')) * rank;
