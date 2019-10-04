@@ -232,13 +232,13 @@ class TSmallGeoffrey {
                if($this->noBoxeHere($y,$x, $TBox)) {
                        
                   $empty_place = true;
-                  if($this->isLargeEnougthEmptyPlace($y,$x, $h, $w, $y_first_block_not_enougth_large)) {
+                  //if($this->isLargeEnougthEmptyPlace($y,$x, $h, $w, $y_first_block_not_enougth_large)) {
                         if($this->debug) print '...trouvé ('.$y.','.$x.') !<br />';    
                         $this->correctBoxHeight($y,$x, $h, $w, $TBox);
                         	
                       return array($x,$y, $h); 
                       
-                  }
+                  //}
                 
                  
                }
