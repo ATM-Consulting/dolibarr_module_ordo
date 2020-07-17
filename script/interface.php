@@ -1,5 +1,5 @@
 <?php
-
+set_time_limit(0); // Ticket 11569
 require '../config.php';
 
 if($conf->of->enabled)dol_include_once('/of/class/ordre_fabrication_asset.class.php');
@@ -893,6 +893,9 @@ function _tasks_ordo(&$db,&$TWorkstation, $status, $fk_workstation=0) {
     if(empty($conf->global->SCRUM_ALLOW_ALL_TASK_IN_GRID)) {
 	    $sql.=" AND ex.grid_use=1 ";
     }
+
+    $sql.= ' AND p.fk_soc NOT IN (100, 101) ';
+
     $sql.=" ORDER BY t.grid_col, t.grid_row  ";
 
     $res = $db->query($sql);
@@ -1004,6 +1007,8 @@ function _tasks(&$db, $id_project, $status, $onlyUseGrid = false, $start = null,
     if (count($sqlwhere)>0) {
     	$sql .= " WHERE ".implode(' AND ',$sqlwhere);
     }
+
+    $sql.= ' AND p.fk_soc NOT IN (100, 101) ';
 
     if (!empty($sqlorder)) {
     	$sql .=$sqlorder;
