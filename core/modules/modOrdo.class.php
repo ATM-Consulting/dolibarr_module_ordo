@@ -235,6 +235,7 @@ class modOrdo extends DolibarrModules
 								'position'=>100,
 								'perms'=>'$user->rights->ordo->ordo',			                // Use 'perms'=>'$user->rights->report->level1->level2' if you want your menu with a permission rules
 								'target'=>'',
+								'enabled'=>1,
 								'user'=>2);				                // 0=Menu for internal users, 1=external users, 2=both
 		$r++;
 	   
@@ -247,6 +248,7 @@ class modOrdo extends DolibarrModules
             'position'=>300,
             'perms'=>'$user->rights->ordo->ordo',
             'target'=>'',
+'enabled'=>1,
             'user'=>2);
         $r++;
        
@@ -259,6 +261,7 @@ class modOrdo extends DolibarrModules
             'position'=>310,
             'perms'=>'$user->rights->ordo->ordo',
             'target'=>'',
+'enabled'=>1,
             'user'=>2);
         $r++;
 		
@@ -272,6 +275,7 @@ class modOrdo extends DolibarrModules
 								'position'=>110,
 								'perms'=>'$user->rights->ordo->ordo',			                // Use 'perms'=>'$user->rights->report->level1->level2' if you want your menu with a permission rules
 								'target'=>'',
+'enabled'=>1,
 								'user'=>2);				                // 0=Menu for internal users, 1=external users, 2=both
 		$r++;
        
