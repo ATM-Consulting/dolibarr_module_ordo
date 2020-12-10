@@ -84,7 +84,9 @@
 	$day_height =  $hour_height * 7;
     if($hour_height == 150) $day_height = $hour_height;
 
-	llxHeader('', $langs->trans('GridTasks') , '','',0,0, array('/ordo/js/scrum.js.php','/ordo/lib/multiselect/js/jquery.multi-select.js'),array('/ordo/lib/multiselect/css/multi-select.css'));
+	$TInclude = array('/ordo/js/scrum.js.php','/ordo/lib/multiselect/js/jquery.multi-select.js');
+	if(!defined('DISABLE_JQUERY_TIPTIP') && !is_file(DOL_URL_ROOT.'/includes/jquery/plugins/tiptip/tipTip.css')) $TInclude[] = '/ordo/js/jquery.tipTip.minified.js';
+	llxHeader('', $langs->trans('GridTasks') , '','',0,0, $TInclude,array('/ordo/lib/multiselect/css/multi-select.css'));
 
 	$form = new Form($db);
 
