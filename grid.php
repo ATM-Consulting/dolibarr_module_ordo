@@ -65,7 +65,9 @@
     $tile_mode = !isset($_SESSION['tile_mode']) ? 1 : $_SESSION['tile_mode'];
 	$day_height =  $hour_height * 7;
 
-	llxHeader('', $langs->trans('GridTasks') , '','',0,0, array('/ordo/js/scrum.js.php'));
+	$TInclude = array('/ordo/js/scrum.js.php');
+	if(!defined('DISABLE_JQUERY_TIPTIP') && !is_file(DOL_URL_ROOT.'/includes/jquery/plugins/tiptip/tipTip.css')) $TInclude[] = '/ordo/js/jquery.tipTip.minified.js';
+	llxHeader('', $langs->trans('GridTasks') , '','',0,0, $TInclude);
 
 	$form = new Form($db);
 
