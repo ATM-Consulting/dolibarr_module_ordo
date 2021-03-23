@@ -25,6 +25,7 @@ Small=Petite
 Middle=Moyenne
 High=Grande
 GridTasks=Ordonnanceur
+ToOrdo=A ordonnancer
 ColumnWidth=Largeur d'un colonne
 TimeRest=Temps restant
 OrdoEarlyMorning=tôt le matin
