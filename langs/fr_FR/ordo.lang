@@ -26,6 +26,7 @@ Middle=Moyenne
 High=Grande
 FixedHeight=Taille fixe
 GridTasks=Ordonnanceur
+ToOrdo=A ordonnancer
 ColumnWidth=Largeur d'une colonne
 TimeRest=Temps restant
 OrdoEarlyMorning=tôt le matin
