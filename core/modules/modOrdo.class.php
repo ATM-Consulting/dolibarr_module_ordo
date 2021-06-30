@@ -55,7 +55,7 @@ class modOrdo extends DolibarrModules
         // (where XXX is value of numeric property 'numero' of module)
         $this->description = "Description of module ordo";
         // Possible values for version are: 'development', 'experimental' or version
-        $this->version = '2.2';
+        $this->version = '3.0.0';
         // Key used in llx_const table to save module status enabled/disabled
         // (where MYMODULE is value of property name of module in uppercase)
         $this->const_name = 'MAIN_MODULE_' . strtoupper($this->name);
@@ -119,7 +119,7 @@ class modOrdo extends DolibarrModules
         // Array to add new pages in new tabs
         // Example:
         $this->tabs = array(
-            
+
         );
         // where objecttype can be
         // 'thirdparty'			to add a tab in third party view
@@ -194,7 +194,7 @@ class modOrdo extends DolibarrModules
          */
         // Permissions
         $this->rights = array(); // Permission array used by this module
-        
+
         $r = 0;
         $this->rights[]=array(
             0=>$this->numero . $r
@@ -202,7 +202,7 @@ class modOrdo extends DolibarrModules
             ,3=>0
             ,4=>'ordo'
         );
-        
+
         $r++;
         // Add here list of permission defined by
         // an id, a label, a boolean and two constant strings.
@@ -216,7 +216,7 @@ class modOrdo extends DolibarrModules
         //// In php code, permission will be checked by test
         //// if ($user->rights->permkey->level1->level2)
         //$this->rights[$r][4] = 'level1';			$this->date_lancement = strtotime('+'.$delai.' day midnight');
-        
+
         //// In php code, permission will be checked by test
         //// if ($user->rights->permkey->level1->level2)
         //$this->rights[$r][5] = 'level2';
@@ -224,7 +224,7 @@ class modOrdo extends DolibarrModules
         // Main menu entries
         $this->menus = array(); // List of menus to add
         $r = 0;
-       
+
       $this->menu[$r]=array(	'fk_menu'=>'fk_mainmenu=project',			                // Put 0 if this is a top menu
 								'type'=>'left',			                // This is a Top menu entry
 								'titre'=>'Ordonnancement',
@@ -237,7 +237,7 @@ class modOrdo extends DolibarrModules
 								'target'=>'',
 								'user'=>2);				                // 0=Menu for internal users, 1=external users, 2=both
 		$r++;
-	   
+
        $this->menu[$r]=array(   'fk_menu'=>'fk_mainmenu=of',     // Use r=value where r is index key used for the parent menu entry (higher parent must be a top menu entry)
             'type'=>'left',         // This is a Left menu entry
             'titre'=>'Ordonnancement',
@@ -249,7 +249,7 @@ class modOrdo extends DolibarrModules
             'target'=>'',
             'user'=>2);
         $r++;
-       
+
       $this->menu[$r]=array(   'fk_menu'=>'fk_mainmenu=of,fk_leftmenu=ordoGPAO',     // Use r=value where r is index key used for the parent menu entry (higher parent must be a top menu entry)
             'type'=>'left',         // This is a Left menu entry
             'titre'=>'OrdonnancementStat',
@@ -261,7 +261,7 @@ class modOrdo extends DolibarrModules
             'target'=>'',
             'user'=>2);
         $r++;
-		
+
 	$this->menu[$r]=array(	'fk_menu'=>'fk_mainmenu=project,fk_leftmenu=Scrumboard',			                // Put 0 if this is a top menu
 							'type'=>'left',			                // This is a Top menu entry
 							'titre'=>'Projets par Chef de projet',
@@ -274,8 +274,8 @@ class modOrdo extends DolibarrModules
 								'target'=>'',
 								'user'=>2);				                // 0=Menu for internal users, 1=external users, 2=both
 		$r++;
-       
-	   
+
+
         // Exports
         $r = 1;
         // Example:
@@ -380,36 +380,36 @@ class modOrdo extends DolibarrModules
     public function init($options = '')
     {
     	global $db;
-	
+
 	    $sql = array();
         $result = $this->loadTables();
-		
-		$db->query("ALTER TABLE ".MAIN_DB_PREFIX."projet_task 
-					ADD grid_col FLOAT NOT NULL DEFAULT 0,
-					ADD grid_row FLOAT NOT NULL DEFAULT 999999");		
-	
+
 		$db->query("ALTER TABLE ".MAIN_DB_PREFIX."projet_task
-					ADD grid_height FLOAT NOT NULL DEFAULT 0");		
-		
+					ADD grid_col FLOAT NOT NULL DEFAULT 0,
+					ADD grid_row FLOAT NOT NULL DEFAULT 999999");
+
+		$db->query("ALTER TABLE ".MAIN_DB_PREFIX."projet_task
+					ADD grid_height FLOAT NOT NULL DEFAULT 0");
+
 		$db->query('ALTER TABLE '.MAIN_DB_PREFIX.'projet_task
-				ADD INDEX grid_row_grid_col (grid_row, grid_col)');		
-	
+				ADD INDEX grid_row_grid_col (grid_row, grid_col)');
+
 		$db->query('ALTER TABLE '.MAIN_DB_PREFIX.'projet_task
 				ADD INDEX progress (progress)');
-				
+
 		$db->query('ALTER TABLE '.MAIN_DB_PREFIX.'projet_task
-				ADD INDEX planned_workload (planned_workload)');		
-	
+				ADD INDEX planned_workload (planned_workload)');
+
 			$db->query("ALTER TABLE ".MAIN_DB_PREFIX."projet_task
-				ADD date_estimated_start DATETIME NULL 
-			  , ADD date_estimated_end DATETIME NULL 
+				ADD date_estimated_start DATETIME NULL
+			  , ADD date_estimated_end DATETIME NULL
 			  , ADD INDEX (date_estimated_start, date_estimated_end)");
-					
-	
+
+
 		dol_include_once('/core/class/extrafields.class.php');
         $extrafields=new ExtraFields($this->db);
         $res = $extrafields->addExtraField('color', 'Couleur du projet', 'varchar', 1, 8, 'projet', false, false, '');
-		
+
         $extrafields=new ExtraFields($this->db);
 		$res = $extrafields->addExtraField('grid_use', 'Afficher sur la grille de planning', 'boolean', 0, '', 'projet_task');
         $extrafields=new ExtraFields($this->db);
@@ -424,7 +424,7 @@ class modOrdo extends DolibarrModules
         $res = $extrafields->addExtraField('fk_workstation', 'Poste de charge immobilisé', 'sellist', 0, '', 'actioncomm',0,0,'',serialize(array('options'=>array('workstation:name:rowid'=>null))));
      	$extrafields=new ExtraFields($this->db);
         $res = $extrafields->addExtraField('needed_ressource', 'nb ressources immobilisées', 'int', 0, '', 'actioncomm');
-        
+
 		return $this->_init($sql, $options);
     }
     /**
